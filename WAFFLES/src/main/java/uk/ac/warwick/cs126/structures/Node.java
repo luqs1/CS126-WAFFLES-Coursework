@@ -24,10 +24,12 @@ public class Node<V>{
 
     public void setLeft(Node<V> left){
         this.left = left;
+        this.left.setParent(this);
     }
 
     public void setRight(Node<V> right){
         this.right = right;
+        this.right.setParent(this);
     }
 
     public void setVal(V val){
@@ -62,7 +64,7 @@ public class Node<V>{
 
     public int getHeight(){
         if (isExternal())
-            return 0;
+            return 1;
         else if (right == null)
             return 1 + left.getHeight();
         else if (left == null)
@@ -80,10 +82,19 @@ public class Node<V>{
         if (isExternal())
             return true;
         if (getLeft() == null)
-            return getRight().getHeight() <= 1;
+            return getRight().isExternal();
         if (getRight() == null)
-            return getLeft().getHeight()  <= 1;
+            return getLeft().isExternal();
         else
             return Math.abs(getLeft().getHeight() - getRight().getHeight()) <= 1;
+    }
+
+    public void replaceWith(Node<V> b) {
+        Node<V> p = getParent();
+        if (p.getLeft().equals(this))
+            p.setLeft(b);
+        else {
+            p.setRight(b);
+        }
     }
 }
