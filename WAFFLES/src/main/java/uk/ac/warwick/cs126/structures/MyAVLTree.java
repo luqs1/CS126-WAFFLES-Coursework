@@ -49,8 +49,8 @@ public class MyAVLTree<K extends Comparable<K>,V> implements IAVLTree<K,V> {
         return null;
     }
 
-    public void remove(V val) {
-        remove(keyMethod.apply(val));
+    public boolean remove(V val) {
+        return remove(keyMethod.apply(val)) != null;
     }
 
     public void triRes(Node<V> grand, Node<V> parent, Node<V> child) {

@@ -5,7 +5,7 @@ import java.util.function.Function;
 public interface IAVLTree<K extends Comparable<K>,V >{
     boolean insert(V val);
     V remove(K key);
-    void remove(V val);
+    boolean remove(V val);
     void triRes(Node<V> a);
 
 
