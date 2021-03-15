@@ -13,6 +13,10 @@ public class MyArrayList<E> {
         this.size = 0;
     }
 
+    public Object[] getArray() {
+        return array;
+    }
+
     public boolean add(E element) {
         // Adds element to the array, returns true on success and false otherwise.
         // Doubles the array size when reached capacity
@@ -112,9 +116,10 @@ public class MyArrayList<E> {
             return "Empty";
         }
 
-        StringBuilder ret = new StringBuilder("");
+        StringBuilder ret = new StringBuilder();
         for (int i = 0; i < this.size; i++) {
-            ret.append("Index: " + i + "    Element: " + this.get(i) + "\n");
+            String part = "Index: " + i + "    Element: " + this.get(i) + "\n";
+            ret.append(part);
         }
 
         ret.deleteCharAt(ret.length() - 1);
