@@ -10,6 +10,7 @@ import java.text.SimpleDateFormat;
 
 import org.apache.commons.io.IOUtils;
 
+import uk.ac.warwick.cs126.structures.MyAVLTree;
 import uk.ac.warwick.cs126.structures.MyArrayList;
 
 import uk.ac.warwick.cs126.util.DataChecker;
@@ -17,12 +18,14 @@ import uk.ac.warwick.cs126.util.StringFormatter;
 
 public class CustomerStore implements ICustomerStore {
 
-    private MyArrayList<Customer> customerArray;
+    private MyAVLTree<Long, Customer> customerAVL;
+    private MyAVLTree<Long, Customer> blacklisted;
     private DataChecker dataChecker;
 
     public CustomerStore() {
         // Initialise variables here
-        customerArray = new MyArrayList<>();
+        customerAVL = new MyAVLTree<>(Customer::getID);
+        blacklisted = new MyAVLTree<>(Customer:: getID);
         dataChecker = new DataChecker();
     }
 

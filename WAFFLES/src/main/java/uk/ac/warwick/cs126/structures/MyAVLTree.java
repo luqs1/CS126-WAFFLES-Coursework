@@ -1,5 +1,7 @@
 package uk.ac.warwick.cs126.structures;
 
+import uk.ac.warwick.cs126.models.Customer;
+
 import java.util.function.Function;
 
 public class MyAVLTree<K extends Comparable<K>,V> implements IAVLTree<K,V> {
@@ -9,12 +11,39 @@ public class MyAVLTree<K extends Comparable<K>,V> implements IAVLTree<K,V> {
     private int size;
     private final Function<V, K> keyMethod;
 
+    public static void main(String[] args) {
+        // Test
+        MyAVLTree<Integer, String> strings = new MyAVLTree<>(String::length);
+        strings.insert("Sam");
+        strings.insert("Anton");
+        strings.insert("Elizabeth");
+
+        System.out.println(strings);
+    }
+
+    public String toString() {
+        return root + "\n size=" + size +
+                '}';
+    }
+
     public MyAVLTree(Node<V> root, Function<V,K> keyMethod) {
         this.size = 0;
         this.root = root;
         this.keyMethod = keyMethod;
-        if (root != null)
+        if (root != null) {
             size++;
+            this.root.setParent(null);
+        }
+    }
+
+    public MyAVLTree(Function<V,K> keyMethod) {
+        this(null, keyMethod);
+    }
+
+    private Node<V> setRoot(Node<V> node) {
+        node.setParent(null);
+        root = node;
+        return root;
     }
 
     public boolean insert(V val) { // Doesn't accept identical Keys.
@@ -23,7 +52,7 @@ public class MyAVLTree<K extends Comparable<K>,V> implements IAVLTree<K,V> {
         Node<V> ptr = root;
 
         if (ptr == null) { // Putting in the first node.
-            root = node;
+            setRoot(node);
             size++;
             return true;
         }
@@ -36,6 +65,7 @@ public class MyAVLTree<K extends Comparable<K>,V> implements IAVLTree<K,V> {
                 if (ptr.getRight() == null) {
                     ptr.setRight(node);
                     added=true;
+                    ptr = ptr.getRight();
                 }
                 else {
                     ptr = ptr.getRight();
@@ -45,6 +75,7 @@ public class MyAVLTree<K extends Comparable<K>,V> implements IAVLTree<K,V> {
                 if (ptr.getLeft() == null) {
                     ptr.setLeft(node);
                     added=true;
+                    ptr = ptr.getLeft();
                 }
                 else{
                     ptr = ptr.getLeft();
@@ -57,19 +88,28 @@ public class MyAVLTree<K extends Comparable<K>,V> implements IAVLTree<K,V> {
     }
 
     public void removeRes(Node<V> ptr) {
-        while (ptr.balanced()) {
+        while (ptr.balanced() || ptr.getHeight() < 3) {
             if (ptr.getParent() == null) {
                 return;
             }
             ptr = ptr.getParent();
         }
         Node<V> child;
-        if (ptr.getRight().getHeight() > ptr.getLeft().getHeight())
+        if (ptr.getRight() == null)
+            child = ptr.getLeft();
+        else if (ptr.getLeft() == null)
+            child = ptr.getRight();
+        else if (ptr.getRight().getHeight() > ptr.getLeft().getHeight())
             child = ptr.getRight();
         else
             child = ptr.getLeft();
+
         Node<V> grandchild;
-        if (child.getRight().getHeight() > child.getLeft().getHeight())
+        if (child.getRight() == null)
+            grandchild = child.getLeft();
+        else if (child.getLeft() == null)
+            grandchild = child.getRight();
+        else if (child.getRight().getHeight() > child.getLeft().getHeight())
             grandchild = ptr.getRight();
         else
             grandchild = ptr.getLeft();
@@ -84,22 +124,11 @@ public class MyAVLTree<K extends Comparable<K>,V> implements IAVLTree<K,V> {
 
     public V remove(K key) {
         Node<V> ptr = root;
-        while (true) {
+        boolean found = false;
+        while (!found) {
             int a = key.compareTo(keyMethod.apply(ptr.getVal()));
             if (a == 0) {
-                if (ptr.getParent() == null) {
-                    root = null;
-                    size--;
-                    return ptr.getVal();
-                }
-                Node<V> parent = ptr.getParent();
-                if (parent.getLeft().equals(ptr))
-                    parent.setLeft(null);
-                else
-                    parent.setRight(null);
-                size--;
-                removeRes(ptr);
-                return ptr.getVal();
+                found = true;
             }
             else if (a > 0){
                 if (ptr.getRight() == null)
@@ -115,6 +144,36 @@ public class MyAVLTree<K extends Comparable<K>,V> implements IAVLTree<K,V> {
                     ptr = ptr.getLeft();
             }
         }
+        V val = ptr.getVal();
+        if (ptr.isExternal())
+            ptr.deleteNode();
+        else if (ptr.getRight() == null) {
+            if (ptr.getParent() == null)
+
+                ptr = setRoot(ptr.getLeft());
+            else
+                ptr.replaceWith(ptr.getLeft());
+        }
+        else if (ptr.getLeft() == null) {
+            if (ptr.getParent() == null)
+                ptr = setRoot(ptr.getRight());
+            else
+                ptr.replaceWith(ptr.getRight());
+        }
+        else {
+            Node<V> min = ptr.getRight();
+            while (min.getLeft() != null)
+                min = min.getLeft();
+            ptr.setVal(min.getVal());
+            if (min.getRight() != null)
+                min.replaceWith(min.getRight());
+            else
+                min.deleteNode();
+        }
+        removeRes(ptr); //TODO: Check if this is it.
+        size--;
+        return val;
+
     }
 
     public boolean remove(V val) {
@@ -140,7 +199,10 @@ public class MyAVLTree<K extends Comparable<K>,V> implements IAVLTree<K,V> {
         */
 
         if (comp1 == comp2) {
-            grand.replaceWith(parent);
+            if (grand.getParent() == null)
+                setRoot(parent);
+            else
+                grand.replaceWith(parent);
             if (comp1) {
                 grand.setLeft(parent.getRight());
                 parent.setRight(grand);
@@ -149,9 +211,13 @@ public class MyAVLTree<K extends Comparable<K>,V> implements IAVLTree<K,V> {
                 grand.setRight(parent.getLeft());
                 parent.setLeft(grand);
             }
+            triRes(parent);
         }
         else {
-            grand.replaceWith(child);
+            if (grand.getParent() == null)
+                setRoot(child);
+            else
+                grand.replaceWith(child);
             if (comp1) {
                 parent.setRight(child.getLeft());
                 grand.setLeft(child.getRight());
@@ -164,14 +230,17 @@ public class MyAVLTree<K extends Comparable<K>,V> implements IAVLTree<K,V> {
                 child.setRight(parent);
                 child.setLeft(grand);
             }
-
+            triRes(child);
         }
-        triRes(parent);
     }
 
     public void triRes(Node<V> child) {
         Node<V> parent = child.getParent();
+        if (parent == null)
+            return;
         Node<V> grand = parent.getParent();
+        if (grand == null)
+            return;
         triRes(grand,parent,child);
     }
 
@@ -197,13 +266,21 @@ public class MyAVLTree<K extends Comparable<K>,V> implements IAVLTree<K,V> {
         }
     }
 
-    public V[] preorder() { //TODO: Will implement if needed.
-        return null;
+    public Object[] preorder() { //TODO: Will implement if needed.
+        return preorder(root, new MyArrayList<>()).getArray();
     }
 
-    @SuppressWarnings("unchecked")
-    public V[] inorder() {
-        return (V[]) inorder(root, new MyArrayList<>()).getArray();
+    private MyArrayList<V> preorder(Node<V> node, MyArrayList<V> list) {
+        list.add(node.getVal());
+        if (node.getLeft() != null)
+            list = preorder(node.getLeft(), list);
+        if (node.getRight() != null)
+            list = preorder(node.getRight(), list);
+        return list;
+    }
+
+    public Object[] inorder() {
+        return inorder(root, new MyArrayList<>()).getArray();
     }
 
     private MyArrayList<V> inorder(Node<V> node, MyArrayList<V> list) {
@@ -216,7 +293,17 @@ public class MyAVLTree<K extends Comparable<K>,V> implements IAVLTree<K,V> {
         return list;
     }
 
-    public V[] postorder() { //TODO: Will implement if needed.
-        return null;
+    public Object[] postorder() {
+        return postorder(root, new MyArrayList<>()).getArray();
+    }
+
+    private MyArrayList<V> postorder(Node<V> node, MyArrayList<V> list) {
+        if (node.getLeft() != null)
+            list = postorder(node.getLeft(), list);
+        if (node.getRight() != null)
+            list = postorder(node.getRight(), list);
+        list.add(node.getVal());
+
+        return list;
     }
 }

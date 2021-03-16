@@ -1,5 +1,7 @@
 package uk.ac.warwick.cs126.structures;
 
+import java.lang.reflect.Array;
+
 public class MyArrayList<E> {
 
     private Object[] array;
@@ -13,8 +15,10 @@ public class MyArrayList<E> {
         this.size = 0;
     }
 
-    public Object[] getArray() {
-        return array;
+    public Object[] getArray() { // O(n)
+        Object[] out = new Object[size];
+        System.arraycopy(array,0,out,0,this.size);
+        return out;
     }
 
     public boolean add(E element) {

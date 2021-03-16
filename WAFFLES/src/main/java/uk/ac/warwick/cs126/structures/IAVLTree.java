@@ -11,9 +11,9 @@ public interface IAVLTree<K extends Comparable<K>,V >{
 
     V search(K key);
 
-    V[] preorder();
-    V[] inorder();
-    V[] postorder();
+    Object[] preorder();
+    Object[] inorder();
+    Object[] postorder();
 
 
 

@@ -15,7 +15,17 @@ public class Node<V>{
     }
 
     public Node(V val) {
-        this(val, null, null);
+        this.val = val;
+        this.left = null;
+        this.right = null;
+
+    }
+
+    public String toString() {
+        return val +
+                ", L: {" + left +
+                "}, R: {" + right +
+                "}";
     }
 
     public void setParent(Node<V> parent) {
@@ -24,12 +34,14 @@ public class Node<V>{
 
     public void setLeft(Node<V> left){
         this.left = left;
-        this.left.setParent(this);
+        if (!(left == null))
+            this.left.setParent(this);
     }
 
     public void setRight(Node<V> right){
         this.right = right;
-        this.right.setParent(this);
+        if (!(right == null))
+            this.right.setParent(this);
     }
 
     public void setVal(V val){
@@ -89,9 +101,17 @@ public class Node<V>{
             return Math.abs(getLeft().getHeight() - getRight().getHeight()) <= 1;
     }
 
+    public void deleteNode(){
+        replaceWith(null);
+    }
+
     public void replaceWith(Node<V> b) {
         Node<V> p = getParent();
-        if (p.getLeft().equals(this))
+        if (p.getLeft() == null)
+            p.setRight(b);
+        else if (p.getRight() == null)
+            p.setLeft(b);
+        else if (p.getLeft().equals(this))
             p.setLeft(b);
         else {
             p.setRight(b);
