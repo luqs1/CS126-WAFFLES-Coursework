@@ -1,7 +1,5 @@
 package uk.ac.warwick.cs126.structures;
 
-import uk.ac.warwick.cs126.models.Customer;
-
 import java.util.function.Function;
 
 public class MyAVLTree<K extends Comparable<K>,V> implements IAVLTree<K,V> {
@@ -65,21 +63,15 @@ public class MyAVLTree<K extends Comparable<K>,V> implements IAVLTree<K,V> {
                 if (ptr.getRight() == null) {
                     ptr.setRight(node);
                     added=true;
-                    ptr = ptr.getRight();
                 }
-                else {
-                    ptr = ptr.getRight();
-                }
+                ptr = ptr.getRight();
             }
             else {
                 if (ptr.getLeft() == null) {
                     ptr.setLeft(node);
                     added=true;
-                    ptr = ptr.getLeft();
                 }
-                else{
-                    ptr = ptr.getLeft();
-                }
+                ptr = ptr.getLeft();
             }
         }
         size++;
