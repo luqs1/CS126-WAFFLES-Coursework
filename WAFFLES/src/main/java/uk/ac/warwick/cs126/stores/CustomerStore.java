@@ -114,6 +114,8 @@ public class CustomerStore implements ICustomerStore {
     }
 
     private Customer[] getCopy(Customer[] customers) { // Important to prevent side effects to original array
+        if (customers == null)
+            return new Customer[0];
         Customer[] copy = new Customer[customers.length];
         System.arraycopy(customers,0,copy,0,customers.length);
         return copy;
@@ -135,6 +137,8 @@ public class CustomerStore implements ICustomerStore {
     }
 
     public Customer[] getCustomers(Customer[] customers) {
+        if (customers == null)
+            return new Customer[0];
         return sorter.sort(getCopy(customers));
     }
 
@@ -157,10 +161,15 @@ public class CustomerStore implements ICustomerStore {
     }
 
     public Customer[] getCustomersByName(Customer[] customers) {
+        if (customers == null)
+            return new Customer[0];
         return sorter.sort(getCopy(customers),this::nameComparison);
     }
 
     public Customer[] getCustomersContaining(String searchTerm) {
+        if (searchTerm == null) {
+            return new Customer[0];
+        }
         String searchTermProcessed = StringFormatter.
                 convertAccentsFaster(searchTerm).
                 toLowerCase().
