@@ -1499,6 +1499,21 @@ public class StringFormatter {
         for (String[] combination: accentAndConvertedAccent) {
             converterAVL.insert(combination);
         }
+
+    }
+
+    public static void main(String[] args) {
+        String unconverted = "Abrahaⅿ Linⅽℴln has a big bearⅾ";
+        long initTime = System.nanoTime();
+        String str = convertAccents(unconverted);
+        long timeAfter = System.nanoTime();
+        String str2 = convertAccentsFaster(unconverted);
+        long timeAfter2 = System.nanoTime();
+
+        System.out.println(timeAfter-initTime);
+        System.out.println(str);
+        System.out.println(timeAfter2-timeAfter);
+        System.out.println(str2);
     }
 
     public static String convertAccentsFaster(String str) {
@@ -1507,7 +1522,7 @@ public class StringFormatter {
 
         StringBuilder output = new StringBuilder();
         for (char character: str.toCharArray()) {
-            if ((int) character >= 97 && (int) character <= 122)
+            if ((int) character >= 32 && (int) character <= 126)
                 output.append(character);
             else
                 output.append(converterAVL.search((int) character)[1]);

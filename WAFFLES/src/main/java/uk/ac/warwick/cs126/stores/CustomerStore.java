@@ -161,10 +161,29 @@ public class CustomerStore implements ICustomerStore {
     }
 
     public Customer[] getCustomersContaining(String searchTerm) {
-        // TODO
-        // String searchTermConverted = stringFormatter.convertAccents(searchTerm);
-        // String searchTermConvertedFaster = stringFormatter.convertAccentsFaster(searchTerm);
-        return new Customer[0];
+        String searchTermProcessed = StringFormatter.
+                convertAccentsFaster(searchTerm).
+                toLowerCase().
+                replaceAll("[ ]{2,}", " "); // this replaces all 2 or more whitespaces with 1.
+        Customer[] arr1 = getCustomersByName();
+        MyArrayList<Customer> list = new MyArrayList<>();
+
+        for (Customer customer: arr1) {
+            boolean isInName = (customer.getLastName() + customer.getFirstName())
+                    .toLowerCase()
+                    .contains(searchTermProcessed);
+
+            if (isInName)
+                list.add(customer);
+        }
+
+        Customer[] arr2 = new Customer[list.size()]; // Blame that java doesn't allow generic arrays.
+        // I'd use MyArrayList::getArray otherwise.
+
+        for (int i=0;i<arr2.length;i++)
+            arr2[i] = list.get(i);
+
+        return arr2;
     }
 
 }
