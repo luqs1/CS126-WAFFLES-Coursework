@@ -1,6 +1,11 @@
 package uk.ac.warwick.cs126.util;
 
+import uk.ac.warwick.cs126.structures.MyAVLTree;
+
+import java.util.function.Function;
+
 public class StringFormatter {
+    private static final MyAVLTree<Integer, String[]> converterAVL;
     private static final String[][] accentAndConvertedAccent = {
         {"§", "SS"},
         {"ª", "a"},
@@ -1489,11 +1494,25 @@ public class StringFormatter {
 
     static {
         // Initialise things here
+        Function<String[], Integer> useFirstCode = (String[] comb) -> ((int) comb[0].charAt(0));
+        converterAVL = new MyAVLTree<>(useFirstCode);
+        for (String[] combination: accentAndConvertedAccent) {
+            converterAVL.insert(combination);
+        }
     }
 
     public static String convertAccentsFaster(String str) {
-        // TODO
-        return "";
+        if (str == null)
+            return "";
+
+        StringBuilder output = new StringBuilder();
+        for (char character: str.toCharArray()) {
+            if ((int) character >= 97 && (int) character <= 122)
+                output.append(character);
+            else
+                output.append(converterAVL.search((int) character)[1]);
+        }
+        return output.toString();
     }
 
     public static String convertAccents(String str) {

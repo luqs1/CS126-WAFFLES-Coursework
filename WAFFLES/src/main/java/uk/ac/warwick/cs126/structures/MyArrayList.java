@@ -8,11 +8,15 @@ public class MyArrayList<E> {
     private int size;
     private int capacity;
 
-    public MyArrayList() {
+    public MyArrayList(int capacity) {
         // Initialise variables
-        this.capacity = 1000;
+        this.capacity = capacity;
         this.array = new Object[capacity];
         this.size = 0;
+    }
+
+    public MyArrayList() {
+        this(1000);
     }
 
     public Object[] getArray() { // O(n)
