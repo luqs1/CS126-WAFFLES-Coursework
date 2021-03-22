@@ -7,25 +7,34 @@ import uk.ac.warwick.cs126.models.Restaurant;
 import uk.ac.warwick.cs126.models.Favourite;
 import uk.ac.warwick.cs126.models.Review;
 
-import java.util.Date;
-
 public class DataChecker implements IDataChecker {
 
     public DataChecker() {
         // Initialise things here
     }
 
-    public static boolean allNotNull(Object[] objects) {
+    public static boolean anyNull(Object[] objects) {
         for (Object a: objects) {
             if (a == null)
-                return false;
+                return true;
         }
-        return true;
+        return false;
     }
 
     public Long extractTrueID(String[] repeatedID) {
-        // TODO
-        return null;
+        if (repeatedID.length != 3)
+            return null;
+        String a = repeatedID[0];
+        String b = repeatedID[1];
+        String c = repeatedID[2];
+
+        if (a.compareTo(b) != 0 && a.compareTo(c) != 0 && b.compareTo(c) != 0)
+            return null;
+
+        if (a.compareTo(b) == 0 || a.compareTo(c) == 0)
+            return Long.parseLong(a);
+
+        return Long.parseLong(b);
     }
 
     public boolean isValid(Long inputID) {
@@ -68,7 +77,7 @@ public class DataChecker implements IDataChecker {
                 customer.getLatitude(),
                 customer.getLongitude(),
         };
-        if (!allNotNull(entries))
+        if (anyNull(entries))
             return false;
         return isValid(customer.getID());
     }
@@ -99,7 +108,7 @@ public class DataChecker implements IDataChecker {
                 restaurant.getWarwickStars(),
                 restaurant.getCustomerRating(),
         };
-        if (!allNotNull(entries))
+        if (anyNull(entries))
             return false;
 
         if (restaurant.getDateEstablished().compareTo(restaurant.getLastInspectedDate()) > 0)
@@ -142,7 +151,7 @@ public class DataChecker implements IDataChecker {
                 favourite.getRestaurantID(),
                 favourite.getDateFavourited(),
         };
-        if (!allNotNull(entries))
+        if (anyNull(entries))
             return false;
     return isValid(favourite.getID()) || isValid(favourite.getCustomerID()) || isValid(favourite.getRestaurantID());
     }
@@ -159,7 +168,7 @@ public class DataChecker implements IDataChecker {
                 review.getRating(),
         };
 
-        if (!allNotNull(entries))
+        if (anyNull(entries))
             return false;
 
         return isValid(review.getID()) || isValid(review.getCustomerID()) || isValid(review.getRestaurantID());

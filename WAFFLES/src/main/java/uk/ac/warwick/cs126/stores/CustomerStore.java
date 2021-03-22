@@ -31,9 +31,9 @@ public class CustomerStore implements ICustomerStore {
         customerAVL = new MyAVLTree<>(Customer::getID);
         blacklisted = new MyAVLTree<>(Customer:: getID);
         dataChecker = new DataChecker();
-        Function<Pair<Customer>, Integer> comp =
+        Function<Pair<Customer>, Integer> defaultComp =
                 (Pair<Customer> pair) -> (pair.left.getID().compareTo(pair.right.getID()));
-        sorter = new Sorter<>(comp);
+        sorter = new Sorter<>(defaultComp);
     }
 
     public Customer[] loadCustomerDataToArray(InputStream resource) {
@@ -90,16 +90,17 @@ public class CustomerStore implements ICustomerStore {
     }
 
     public boolean addCustomer(Customer customer) {
-        if (dataChecker.isValid(customer) && !blacklisted.search(customer)) {
-            if (customerAVL.search(customer)) {
-                blacklisted.insert(customer);
-                return false;
-            }
-            customerAVL.insert(customer);
-            return true;
-        }
-        else
+        if (!dataChecker.isValid(customer) || blacklisted.search(customer))
             return false;
+
+        if (customerAVL.search(customer)) {
+            blacklisted.insert(customer);
+            customerAVL.remove(customer);
+            return false;
+        }
+
+        customerAVL.insert(customer);
+        return true;
     }
 
     public boolean addCustomer(Customer[] customers) {
@@ -107,9 +108,19 @@ public class CustomerStore implements ICustomerStore {
             return false;
         boolean allDone = true;
         for (Customer customer: customers) {
-            allDone = allDone && addCustomer(customer);
+            allDone = allDone & addCustomer(customer);
         }
         return allDone;
+    }
+
+    private Customer[] intoCustomerArray(Object[] unCast) {
+        if (unCast == null)
+            return null;
+        Customer[] arr = new Customer[unCast.length];
+        for (int i=0;i< unCast.length;i++)
+            arr[i] = (Customer) unCast[i];
+
+        return arr;
     }
 
     private Customer[] getCopy(Customer[] customers) { // Important to prevent side effects to original array
@@ -127,12 +138,7 @@ public class CustomerStore implements ICustomerStore {
     }
 
     public Customer[] getCustomers() { // Didn't use method below because this is a feature of AVLTree.
-        Object[] unCast = customerAVL.inorder();
-        Customer[] out = new Customer[unCast.length]; // Issues with generic arrays forced this.
-        for (int i=0; i<unCast.length; i++) {
-            out[i] = (Customer) unCast[i];
-        }
-        return out;
+        return intoCustomerArray(customerAVL.inorder());
     }
 
     public Customer[] getCustomers(Customer[] customers) {
@@ -146,13 +152,12 @@ public class CustomerStore implements ICustomerStore {
         Customer r = pair.right;
         int out = l.getLastName().toLowerCase().
                 compareTo(r.getLastName().toLowerCase());
-        if (out != 0)
-            return out;
-        out = l.getFirstName().toLowerCase().
+        if (out == 0)
+            out = l.getFirstName().toLowerCase().
                 compareTo(r.getFirstName().toLowerCase());
-        if (out != 0)
-            return out;
-        return l.getID().compareTo(r.getID());
+        if (out == 0)
+            out = l.getID().compareTo(r.getID());
+        return out;
     }
 
     public Customer[] getCustomersByName() {

@@ -177,6 +177,10 @@ public class MyAVLTree<K extends Comparable<K>,V> implements IAVLTree<K,V> {
         return remove(keyMethod.apply(val)) != null;
     }
 
+    public int getSize() {
+        return size;
+    }
+
     private void triRes(Node<V> grand, Node<V> parent, Node<V> child) {
         if (grand.balanced()) // Important because it calls itself.
             return;
@@ -266,7 +270,8 @@ public class MyAVLTree<K extends Comparable<K>,V> implements IAVLTree<K,V> {
     }
 
     public boolean search(V value) {
-        return search(keyMethod.apply(value)) != null;
+        V a = search(keyMethod.apply(value));
+        return a != null && a == value;
     }
 
     public Object[] preorder() { //TODO: Will implement if needed.

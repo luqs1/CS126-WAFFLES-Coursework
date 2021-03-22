@@ -1,7 +1,5 @@
 package uk.ac.warwick.cs126.structures;
 
-import java.lang.reflect.Array;
-
 public class MyArrayList<E> {
 
     private Object[] array;
