@@ -74,17 +74,94 @@ public class DataChecker implements IDataChecker {
     }
 
     public boolean isValid(Restaurant restaurant) {
-        // TODO
-        return false;
+        if (restaurant == null)
+            return false;
+        Object[] entries = {
+                restaurant.getRepeatedID(),
+                restaurant.getID(),
+                restaurant.getName(),
+                restaurant.getOwnerFirstName(),
+                restaurant.getOwnerLastName(),
+                restaurant.getCuisine(),
+                restaurant.getEstablishmentType(),
+                restaurant.getPriceRange(),
+                restaurant.getDateEstablished(),
+                restaurant.getLatitude(),
+                restaurant.getLongitude(),
+                restaurant.getVegetarianOptions(),
+                restaurant.getVeganOptions(),
+                restaurant.getGlutenFreeOptions(),
+                restaurant.getNutFreeOptions(),
+                restaurant.getLactoseFreeOptions(),
+                restaurant.getHalalOptions(),
+                restaurant.getLastInspectedDate(),
+                restaurant.getFoodInspectionRating(),
+                restaurant.getWarwickStars(),
+                restaurant.getCustomerRating(),
+        };
+        if (!allNotNull(entries))
+            return false;
+
+        if (restaurant.getDateEstablished().compareTo(restaurant.getLastInspectedDate()) > 0)
+            return false;
+
+        boolean validIRating = false;
+        for (int i : new int[]{0, 1, 2, 3, 4, 5}) {
+            if (i == restaurant.getFoodInspectionRating()) {
+                validIRating = true;
+                break;
+            }
+        }
+        if (!validIRating)
+            return false;
+
+
+        boolean validStars = false;
+        for (int i: new int[]{0,1,2,3})
+            if (i == restaurant.getWarwickStars()) {
+                validStars = true;
+                break;
+            }
+        if (!validStars)
+            return false;
+
+        if (restaurant.getCustomerRating() != 0.0f
+                || (restaurant.getCustomerRating() >= 1.0f && restaurant.getCustomerRating() <= 5.0f))
+            return false;
+
+        restaurant.setID(extractTrueID(restaurant.getRepeatedID()));
+        return isValid(restaurant.getID());
     }
 
     public boolean isValid(Favourite favourite) {
-        // TODO
-        return false;
+        if (favourite == null)
+            return false;
+        Object[] entries = {
+                favourite.getID(),
+                favourite.getCustomerID(),
+                favourite.getRestaurantID(),
+                favourite.getDateFavourited(),
+        };
+        if (!allNotNull(entries))
+            return false;
+    return isValid(favourite.getID()) || isValid(favourite.getCustomerID()) || isValid(favourite.getRestaurantID());
     }
 
     public boolean isValid(Review review) {
-        // TODO
-        return false;
+        if (review == null)
+            return false;
+        Object[] entries = {
+                review.getID(),
+                review.getCustomerID(),
+                review.getRestaurantID(),
+                review.getDateReviewed(),
+                review.getReview(),
+                review.getRating(),
+        };
+
+        if (!allNotNull(entries))
+            return false;
+
+        return isValid(review.getID()) || isValid(review.getCustomerID()) || isValid(review.getRestaurantID());
     }
 }

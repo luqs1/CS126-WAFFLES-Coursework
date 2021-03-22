@@ -10,18 +10,21 @@ import java.text.SimpleDateFormat;
 
 import org.apache.commons.io.IOUtils;
 
+import uk.ac.warwick.cs126.structures.MyAVLTree;
 import uk.ac.warwick.cs126.structures.MyArrayList;
 
 import uk.ac.warwick.cs126.util.DataChecker;
 
 public class FavouriteStore implements IFavouriteStore {
 
-    private MyArrayList<Favourite> favouriteArray;
+    private MyAVLTree<Long,Favourite> favouriteAVL;
     private DataChecker dataChecker;
+    private MyAVLTree<Long,Favourite> blacklistedAVL;
 
     public FavouriteStore() {
         // Initialise variables here
-        favouriteArray = new MyArrayList<>();
+        favouriteAVL = new MyAVLTree<>(Favourite::getID);
+        blacklistedAVL = new MyAVLTree<>(Favourite::getID);
         dataChecker = new DataChecker();
     }
 
