@@ -13,12 +13,12 @@ public class TestRunner {
 
     public static void main(String[] args) {
         // Initialise and run tests, comment out if you want to omit those tests
-        // new TestTheConstructorsAndInitializers();
-        // new TestTheCustomerStore(); //Passed
-         new TestTheFavouriteStore();
-        // new TestTheRestaurantStore(); // Passed
+         new TestTheConstructorsAndInitializers();
+         new TestTheCustomerStore(); //Passed
+         new TestTheFavouriteStore(); // Passed
+         new TestTheRestaurantStore(); // Passed
         // new TestTheReviewStore();
-        // new TestTheUtils();
+         new TestTheUtils();
     }
 
     static InputStream loadData(String filename) {

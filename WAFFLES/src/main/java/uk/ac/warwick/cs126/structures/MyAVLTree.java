@@ -267,11 +267,11 @@ public class MyAVLTree<K extends Comparable<K>, V> implements IAVLTree<K, V> {
     }
 
     private MyArrayList<V> preorder(Node<V> node, MyArrayList<V> list) {
+        if (node == null)
+            return list;
         list.add(node.getVal());
-        if (node.getLeft() != null)
-            preorder(node.getLeft(), list);
-        if (node.getRight() != null)
-            preorder(node.getRight(), list);
+        preorder(node.getLeft(), list);
+        preorder(node.getRight(), list);
         return list;
     }
 
@@ -282,12 +282,9 @@ public class MyAVLTree<K extends Comparable<K>, V> implements IAVLTree<K, V> {
     private MyArrayList<V> inorder(Node<V> node, MyArrayList<V> list) {
         if (node == null)
             return list;
-        if (node.getLeft() != null)
-            inorder(node.getLeft(), list);
+        inorder(node.getLeft(),list);
         list.add(node.getVal());
-        if (node.getRight() != null)
-            inorder(node.getRight(), list);
-
+        inorder(node.getRight(),list);
         return list;
     }
 
@@ -296,10 +293,10 @@ public class MyAVLTree<K extends Comparable<K>, V> implements IAVLTree<K, V> {
     }
 
     private MyArrayList<V> postorder(Node<V> node, MyArrayList<V> list) {
-        if (node.getLeft() != null)
-            postorder(node.getLeft(), list);
-        if (node.getRight() != null)
-            postorder(node.getRight(), list);
+        if (node == null)
+            return list;
+        postorder(node.getLeft(), list);
+        postorder(node.getRight(), list);
         list.add(node.getVal());
 
         return list;

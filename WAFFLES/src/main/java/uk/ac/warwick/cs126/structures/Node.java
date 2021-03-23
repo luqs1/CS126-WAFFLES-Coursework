@@ -5,20 +5,21 @@ public class Node<V> {
     private Node<V> parent;
     private Node<V> left;
     private Node<V> right;
+    private int height;
 
     public Node(V val, Node<V> left, Node<V> right) {
         this.val = val;
         this.left = left;
-        this.left.setParent(this);
+        if (left != null)
+            this.left.setParent(this);
         this.right = right;
-        this.right.setParent(this);
+        if (right != null)
+            this.right.setParent(this);
+        reCalculateHeight();
     }
 
     public Node(V val) {
-        this.val = val;
-        this.left = null;
-        this.right = null;
-
+        this(val,null,null);
     }
 
     public String toString() {
@@ -36,12 +37,14 @@ public class Node<V> {
         this.left = left;
         if (!(left == null))
             this.left.setParent(this);
+        reCalculateHeight();
     }
 
     public void setRight(Node<V> right) {
         this.right = right;
         if (!(right == null))
             this.right.setParent(this);
+        reCalculateHeight();
     }
 
     public void setVal(V val) {
@@ -64,30 +67,29 @@ public class Node<V> {
         return this.right;
     }
 
-    public Node<V> getSibling() {
-        if (parent.getLeft().equals(this))
-            return parent.right;
-        return parent.left;
-    }
-
     public boolean isExternal() {
         return this.left == null && this.right == null;
     }
 
-    public int getHeight() {
+    public void reCalculateHeight() {
         if (isExternal())
-            return 1;
+            height = 1;
         else if (right == null)
-            return 1 + left.getHeight();
+            height = 1 + left.getHeight();
         else if (left == null)
-            return 1 + right.getHeight();
+            height = 1 + right.getHeight();
         else {
             int a = left.getHeight();
             int b = right.getHeight();
             if (a < b)
-                return 1 + b;
-            return 1 + a;
+                height = 1 + b;
+            else
+                height = 1 + a;
         }
+    }
+
+    public int getHeight() {
+        return height;
     }
 
     public boolean balanced() {

@@ -114,14 +114,15 @@ public class FavouriteStore implements IFavouriteStore {
                     favouriteAVL.insert(f);
                     blacklisted.remove(f);
                     youngerFavourites.remove(f);
+                    break;
                 }
             }
 
             return false;
         }
 
-
-        Favourite[] customersFaves = getFavouritesByCustomerID(favourite.getCustomerID());
+        // There is a problem in this code:
+        /*Favourite[] customersFaves = getFavouritesByCustomerID(favourite.getCustomerID());
         boolean inside = false;
         boolean insideNewer = false;
         Favourite other = null;
@@ -149,6 +150,8 @@ public class FavouriteStore implements IFavouriteStore {
         }
 
         youngerFavourites.insert(favourite);
+         */
+        favouriteAVL.insert(favourite);
         return false;
     }
 
@@ -356,7 +359,6 @@ public class FavouriteStore implements IFavouriteStore {
     }
 
     private Long[] getTop(Function<Favourite, Long> which) {
-        {
             MyAVLTree<Long, Link> linkTree =
                     new MyAVLTree<>((Link link) ->
                             (link.id));
@@ -388,7 +390,6 @@ public class FavouriteStore implements IFavouriteStore {
             for (int i = 0; i < z; i++)
                 top[i] = arr[i].id;
             return top;
-        }
     }
 
     public Long[] getTopCustomersByFavouriteCount() {
