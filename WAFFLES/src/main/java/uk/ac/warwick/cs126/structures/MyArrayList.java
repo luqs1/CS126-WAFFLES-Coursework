@@ -19,7 +19,7 @@ public class MyArrayList<E> {
 
     public Object[] getArray() { // O(n)
         Object[] out = new Object[size];
-        System.arraycopy(array,0,out,0,this.size);
+        System.arraycopy(array, 0, out, 0, this.size);
         return out;
     }
 

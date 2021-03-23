@@ -2,7 +2,7 @@ package uk.ac.warwick.cs126.structures;
 
 import java.util.function.Function;
 
-public class MyAVLTree<K extends Comparable<K>,V> implements IAVLTree<K,V> {
+public class MyAVLTree<K extends Comparable<K>, V> implements IAVLTree<K, V> {
     // A specific kind of AVLTree where the Key can be obtained from the Value.
 
     private Node<V> root;
@@ -29,7 +29,7 @@ public class MyAVLTree<K extends Comparable<K>,V> implements IAVLTree<K,V> {
                 '}';
     }
 
-    public MyAVLTree(Node<V> root, Function<V,K> keyMethod) {
+    public MyAVLTree(Node<V> root, Function<V, K> keyMethod) {
         this.size = 0;
         this.root = root;
         this.keyMethod = keyMethod;
@@ -39,7 +39,7 @@ public class MyAVLTree<K extends Comparable<K>,V> implements IAVLTree<K,V> {
         }
     }
 
-    public MyAVLTree(Function<V,K> keyMethod) {
+    public MyAVLTree(Function<V, K> keyMethod) {
         this(null, keyMethod);
     }
 
@@ -64,17 +64,16 @@ public class MyAVLTree<K extends Comparable<K>,V> implements IAVLTree<K,V> {
             int a = k1.compareTo(keyMethod.apply(ptr.getVal()));
             if (a == 0) // The key is already in use.
                 return false;
-            else if (a > 0){
+            else if (a > 0) {
                 if (ptr.getRight() == null) {
                     ptr.setRight(node);
-                    added=true;
+                    added = true;
                 }
                 ptr = ptr.getRight();
-            }
-            else {
+            } else {
                 if (ptr.getLeft() == null) {
                     ptr.setLeft(node);
-                    added=true;
+                    added = true;
                 }
                 ptr = ptr.getLeft();
             }
@@ -113,8 +112,7 @@ public class MyAVLTree<K extends Comparable<K>,V> implements IAVLTree<K,V> {
 
         // Going to believe by induction that grandchild or child cant be null cus unbalanced.
 
-        triRes(ptr,child,grandchild);
-
+        triRes(ptr, child, grandchild);
 
 
     }
@@ -126,18 +124,15 @@ public class MyAVLTree<K extends Comparable<K>,V> implements IAVLTree<K,V> {
             int a = key.compareTo(keyMethod.apply(ptr.getVal()));
             if (a == 0) {
                 found = true;
-            }
-            else if (a > 0){
+            } else if (a > 0) {
                 if (ptr.getRight() == null)
                     return null;
                 else
                     ptr = ptr.getRight();
-            }
-            else {
+            } else {
                 if (ptr.getLeft() == null) {
                     return null;
-                }
-                else
+                } else
                     ptr = ptr.getLeft();
             }
         }
@@ -150,14 +145,12 @@ public class MyAVLTree<K extends Comparable<K>,V> implements IAVLTree<K,V> {
                 ptr = setRoot(ptr.getLeft());
             else
                 ptr.replaceWith(ptr.getLeft());
-        }
-        else if (ptr.getLeft() == null) {
+        } else if (ptr.getLeft() == null) {
             if (ptr.getParent() == null)
                 ptr = setRoot(ptr.getRight());
             else
                 ptr.replaceWith(ptr.getRight());
-        }
-        else {
+        } else {
             Node<V> min = ptr.getRight();
             while (min.getLeft() != null)
                 min = min.getLeft();
@@ -207,14 +200,12 @@ public class MyAVLTree<K extends Comparable<K>,V> implements IAVLTree<K,V> {
             if (comp1) {
                 grand.setLeft(parent.getRight());
                 parent.setRight(grand);
-            }
-            else {
+            } else {
                 grand.setRight(parent.getLeft());
                 parent.setLeft(grand);
             }
             triRes(parent);
-        }
-        else {
+        } else {
             if (grand.getParent() == null)
                 setRoot(child);
             else
@@ -224,8 +215,7 @@ public class MyAVLTree<K extends Comparable<K>,V> implements IAVLTree<K,V> {
                 grand.setLeft(child.getRight());
                 child.setLeft(parent);
                 child.setRight(grand);
-            }
-            else {
+            } else {
                 parent.setLeft(child.getRight());
                 grand.setRight(child.getLeft());
                 child.setRight(parent);
@@ -242,7 +232,7 @@ public class MyAVLTree<K extends Comparable<K>,V> implements IAVLTree<K,V> {
         Node<V> grand = parent.getParent();
         if (grand == null)
             return;
-        triRes(grand,parent,child);
+        triRes(grand, parent, child);
     }
 
     public V search(K key) {
@@ -253,17 +243,15 @@ public class MyAVLTree<K extends Comparable<K>,V> implements IAVLTree<K,V> {
             int a = key.compareTo(keyMethod.apply(ptr.getVal()));
             if (a == 0) // The key is already in use.
                 return ptr.getVal();
-            else if (a > 0){
+            else if (a > 0) {
                 if (ptr.getRight() == null)
                     return null;
                 else
                     ptr = ptr.getRight();
-            }
-            else {
+            } else {
                 if (ptr.getLeft() == null) {
-                   return null;
-                }
-                else
+                    return null;
+                } else
                     ptr = ptr.getLeft();
             }
         }

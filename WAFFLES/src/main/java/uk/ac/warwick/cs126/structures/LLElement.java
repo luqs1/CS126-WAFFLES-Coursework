@@ -17,19 +17,19 @@ public class LLElement<E> {
         this(null, null);
     }
 
-    public void setVal(E val){
+    public void setVal(E val) {
         this.val = val;
     }
 
-    public void setNext(LLElement<E> next){
+    public void setNext(LLElement<E> next) {
         this.next = next;
     }
 
-    public E getVal(){
+    public E getVal() {
         return val;
     }
 
-    public LLElement<E> getNext(){
+    public LLElement<E> getNext() {
         return next;
     }
 

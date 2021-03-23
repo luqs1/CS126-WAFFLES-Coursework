@@ -19,7 +19,7 @@ import uk.ac.warwick.cs126.util.*;
 
 public class RestaurantStore implements IRestaurantStore {
 
-    private final MyAVLTree<Long,Restaurant> restaurantAVL;
+    private final MyAVLTree<Long, Restaurant> restaurantAVL;
     private final MyAVLTree<Long, Restaurant> blacklisted;
     private final ConvertToPlace convertToPlace;
     private final DataChecker dataChecker;
@@ -121,7 +121,7 @@ public class RestaurantStore implements IRestaurantStore {
 
         boolean allDone = true;
 
-        for (Restaurant restaurant:restaurants) {
+        for (Restaurant restaurant : restaurants) {
             allDone = allDone & addRestaurant(restaurant); //Needs to eval, can't short.
         }
 
@@ -132,7 +132,7 @@ public class RestaurantStore implements IRestaurantStore {
         if (unCast == null)
             return null;
         Restaurant[] arr = new Restaurant[unCast.length];
-        for (int i=0;i< unCast.length;i++)
+        for (int i = 0; i < unCast.length; i++)
             arr[i] = (Restaurant) unCast[i];
 
         return arr;
@@ -142,7 +142,7 @@ public class RestaurantStore implements IRestaurantStore {
         if (favourites == null)
             return new Restaurant[0];
         Restaurant[] copy = new Restaurant[favourites.length];
-        System.arraycopy(favourites,0,copy,0,favourites.length);
+        System.arraycopy(favourites, 0, copy, 0, favourites.length);
         return copy;
     }
 
@@ -180,7 +180,7 @@ public class RestaurantStore implements IRestaurantStore {
     private Integer dateComp(Pair<Restaurant> pair) {
         int out = pair.left.getDateEstablished()
                 .compareTo(pair.right.getDateEstablished()
-        );
+                );
 
         if (out == 0)
             out = nameComp(pair);
@@ -194,7 +194,7 @@ public class RestaurantStore implements IRestaurantStore {
     public Restaurant[] getRestaurantsByDateEstablished(Restaurant[] restaurants) {
         if (restaurants == null)
             return new Restaurant[0];
-        return sorter.sort(getCopy(restaurants),this::dateComp);
+        return sorter.sort(getCopy(restaurants), this::dateComp);
     }
 
     private Integer starComp(Pair<Restaurant> pair) {
@@ -205,6 +205,7 @@ public class RestaurantStore implements IRestaurantStore {
 
         return out;
     }
+
     public Restaurant[] getRestaurantsByWarwickStars() {
         MyArrayList<Restaurant> filtered = new MyArrayList<>();
         for (Restaurant restaurant : getRestaurants()) {
@@ -226,13 +227,13 @@ public class RestaurantStore implements IRestaurantStore {
     }
 
     public Restaurant[] getRestaurantsByRating(Restaurant[] restaurants) {
-       if (restaurants == null)
-           return new  Restaurant[0];
-       return sorter.sort(getCopy(restaurants),this::ratingComp);
+        if (restaurants == null)
+            return new Restaurant[0];
+        return sorter.sort(getCopy(restaurants), this::ratingComp);
     }
 
     public RestaurantDistance[] getRestaurantsByDistanceFrom(float latitude, float longitude) {
-        return getRestaurantsByDistanceFrom(getRestaurants(),latitude,longitude);
+        return getRestaurantsByDistanceFrom(getRestaurants(), latitude, longitude);
     }
 
     public RestaurantDistance[] getRestaurantsByDistanceFrom(Restaurant[] restaurants, float latitude, float longitude) {
@@ -260,10 +261,10 @@ public class RestaurantStore implements IRestaurantStore {
 
         RestaurantDistance[] out = new RestaurantDistance[sorted.length];
 
-        for (int i=0;i<sorted.length;i++)
+        for (int i = 0; i < sorted.length; i++)
             out[i] = new RestaurantDistance(sorted[i], HaversineDistanceCalculator.inKilometres(
-                    sorted[i].getLatitude(),sorted[i].getLongitude(),
-                    latitude,longitude));
+                    sorted[i].getLatitude(), sorted[i].getLongitude(),
+                    latitude, longitude));
         return out;
     }
 
@@ -278,7 +279,7 @@ public class RestaurantStore implements IRestaurantStore {
         Restaurant[] arr1 = getRestaurantsByName();
         MyArrayList<Restaurant> list = new MyArrayList<>();
 
-        for (Restaurant restaurant: arr1) {
+        for (Restaurant restaurant : arr1) {
             boolean isInName = restaurant.getName().contains(searchTermProcessed)
                     || restaurant.getCuisine().name().contains(searchTermProcessed)
                     || convertToPlace.
@@ -288,6 +289,6 @@ public class RestaurantStore implements IRestaurantStore {
                 list.add(restaurant);
         }
 
-        return intoRestaurantArray(list.getArray()) ;
+        return intoRestaurantArray(list.getArray());
     }
 }

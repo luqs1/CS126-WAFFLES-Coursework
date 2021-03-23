@@ -29,7 +29,7 @@ public class CustomerStore implements ICustomerStore {
     public CustomerStore() {
         // Initialise variables here
         customerAVL = new MyAVLTree<>(Customer::getID);
-        blacklisted = new MyAVLTree<>(Customer:: getID);
+        blacklisted = new MyAVLTree<>(Customer::getID);
         dataChecker = new DataChecker();
         Function<Pair<Customer>, Integer> defaultComp =
                 (Pair<Customer> pair) -> (pair.left.getID().compareTo(pair.right.getID()));
@@ -46,7 +46,7 @@ public class CustomerStore implements ICustomerStore {
 
             int lineCount = 0;
             String line;
-            while ((line=lineReader.readLine()) != null) {
+            while ((line = lineReader.readLine()) != null) {
                 if (!("".equals(line))) {
                     lineCount++;
                 }
@@ -107,7 +107,7 @@ public class CustomerStore implements ICustomerStore {
         if (customers == null)
             return false;
         boolean allDone = true;
-        for (Customer customer: customers) {
+        for (Customer customer : customers) {
             allDone = allDone & addCustomer(customer);
         }
         return allDone;
@@ -117,7 +117,7 @@ public class CustomerStore implements ICustomerStore {
         if (unCast == null)
             return null;
         Customer[] arr = new Customer[unCast.length];
-        for (int i=0;i< unCast.length;i++)
+        for (int i = 0; i < unCast.length; i++)
             arr[i] = (Customer) unCast[i];
 
         return arr;
@@ -127,7 +127,7 @@ public class CustomerStore implements ICustomerStore {
         if (customers == null)
             return new Customer[0];
         Customer[] copy = new Customer[customers.length];
-        System.arraycopy(customers,0,copy,0,customers.length);
+        System.arraycopy(customers, 0, copy, 0, customers.length);
         return copy;
     }
 
@@ -154,7 +154,7 @@ public class CustomerStore implements ICustomerStore {
                 compareTo(r.getLastName().toLowerCase());
         if (out == 0)
             out = l.getFirstName().toLowerCase().
-                compareTo(r.getFirstName().toLowerCase());
+                    compareTo(r.getFirstName().toLowerCase());
         if (out == 0)
             out = l.getID().compareTo(r.getID());
         return out;
@@ -167,7 +167,7 @@ public class CustomerStore implements ICustomerStore {
     public Customer[] getCustomersByName(Customer[] customers) {
         if (customers == null)
             return new Customer[0];
-        return sorter.sort(getCopy(customers),this::nameComparison);
+        return sorter.sort(getCopy(customers), this::nameComparison);
     }
 
     public Customer[] getCustomersContaining(String searchTerm) {
@@ -181,7 +181,7 @@ public class CustomerStore implements ICustomerStore {
         Customer[] arr1 = getCustomersByName();
         MyArrayList<Customer> list = new MyArrayList<>();
 
-        for (Customer customer: arr1) {
+        for (Customer customer : arr1) {
             boolean isInName = (customer.getLastName() + customer.getFirstName())
                     .toLowerCase()
                     .contains(searchTermProcessed);

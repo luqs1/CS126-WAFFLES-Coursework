@@ -14,7 +14,7 @@ public class DataChecker implements IDataChecker {
     }
 
     public static boolean anyNull(Object[] objects) {
-        for (Object a: objects) {
+        for (Object a : objects) {
             if (a == null)
                 return true;
         }
@@ -44,12 +44,12 @@ public class DataChecker implements IDataChecker {
 
         if (id.length() != 16)
             return false;
-        char[] digits = {'1','2','3','4','5','6','7','8','9'};
+        char[] digits = {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
         int[] counts = new int[9];
 
-        for (int i=0; i<id.length(); i++) {
+        for (int i = 0; i < id.length(); i++) {
             boolean found = false;
-            for (int j=0; j<9; j++) {
+            for (int j = 0; j < 9; j++) {
                 if (id.charAt(i) == digits[j]) {
                     found = true;
                     counts[j]++;
@@ -59,7 +59,7 @@ public class DataChecker implements IDataChecker {
             if (!found)
                 return false;
         }
-        for (int count: counts) {
+        for (int count : counts) {
             if (count > 3)
                 return false;
         }
@@ -126,7 +126,7 @@ public class DataChecker implements IDataChecker {
 
 
         boolean validStars = false;
-        for (int i: new int[]{0,1,2,3})
+        for (int i : new int[]{0, 1, 2, 3})
             if (i == restaurant.getWarwickStars()) {
                 validStars = true;
                 break;
@@ -153,7 +153,7 @@ public class DataChecker implements IDataChecker {
         };
         if (anyNull(entries))
             return false;
-    return isValid(favourite.getID()) || isValid(favourite.getCustomerID()) || isValid(favourite.getRestaurantID());
+        return isValid(favourite.getID()) || isValid(favourite.getCustomerID()) || isValid(favourite.getRestaurantID());
     }
 
     public boolean isValid(Review review) {

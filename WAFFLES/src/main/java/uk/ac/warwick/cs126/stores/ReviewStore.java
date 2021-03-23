@@ -18,8 +18,8 @@ import uk.ac.warwick.cs126.util.StringFormatter;
 
 public class ReviewStore implements IReviewStore {
 
-    private MyArrayList<Review> reviewArray;
-    private DataChecker dataChecker;
+    private final MyArrayList<Review> reviewArray;
+    private final DataChecker dataChecker;
 
     public ReviewStore() {
         // Initialise variables here

@@ -24,8 +24,7 @@ public class MyLinkedList<E> {
         // if the list is not empty, point the new link to head
         if (!isEmpty()) {
             temp.setNext(head);
-        }
-        else{
+        } else {
             tail = temp;
         }
         // update the head
@@ -43,7 +42,7 @@ public class MyLinkedList<E> {
         // Returns a string representation of this list.
         StringBuilder str = new StringBuilder("[");
         LLElement<E> curr = head;
-        while (curr != null){
+        while (curr != null) {
             str.append(curr.toString());
             curr = curr.getNext();
             if (curr != null)
@@ -55,7 +54,7 @@ public class MyLinkedList<E> {
     public boolean addToTail(E element) {
         // Adds element to tail of the list
         LLElement<E> toAdd = new LLElement<>(element);
-        if (size() == 0){
+        if (size() == 0) {
             add(element);
             return true;
         }
@@ -69,7 +68,7 @@ public class MyLinkedList<E> {
         // Removes and returns the head element
         if (size() == 0)
             return null;
-        if (size() == 1){
+        if (size() == 1) {
             tail = null;
         }
         E val = head.getVal();
@@ -82,11 +81,11 @@ public class MyLinkedList<E> {
         // Removes and returns the tail element
         if (size() == 0)
             return null;
-        if (size() == 1){
+        if (size() == 1) {
             return removeFromHead();
         }
         LLElement<E> curr = head;
-        while (curr.getNext() != tail){
+        while (curr.getNext() != tail) {
             curr = curr.getNext();
         }
         E val = tail.getVal();
@@ -98,11 +97,10 @@ public class MyLinkedList<E> {
     }
 
 
-
     public E get(int index) {
         // Gets the element at index in the list
         LLElement<E> ptr = head;
-        for (int i=size()-1;i>index;i--) {
+        for (int i = size() - 1; i > index; i--) {
             ptr = ptr.getNext();
         }
         return ptr.getVal();
@@ -111,7 +109,7 @@ public class MyLinkedList<E> {
     public int indexOf(E element) {
         // Gets the index of element in the list
         LLElement<E> ptr = head;
-        int i=0;
+        int i = 0;
         while (ptr != null) {
             if (element.equals(ptr.getVal())) {
                 return i;
@@ -125,7 +123,7 @@ public class MyLinkedList<E> {
     public E set(int index, E element) {
         // Sets element at index in the list
         LLElement<E> ptr = head;
-        for (int i=0;i<index;i++) {
+        for (int i = 0; i < index; i++) {
             ptr = ptr.getNext();
         }
         E ret = ptr.getNext().getVal();

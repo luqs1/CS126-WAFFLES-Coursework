@@ -22,8 +22,8 @@ import uk.ac.warwick.cs126.util.Sorter;
 
 public class FavouriteStore implements IFavouriteStore {
 
-    private final MyAVLTree<Long,Favourite> favouriteAVL;
-    private final MyAVLTree<Long,Favourite> blacklisted;
+    private final MyAVLTree<Long, Favourite> favouriteAVL;
+    private final MyAVLTree<Long, Favourite> blacklisted;
     private final MyAVLTree<Long, Favourite> youngerFavourites;
     private final DataChecker dataChecker;
     private final Sorter<Favourite> sorter;
@@ -33,10 +33,10 @@ public class FavouriteStore implements IFavouriteStore {
         // Initialise variables here
         favouriteAVL = new MyAVLTree<>(Favourite::getID);
         blacklisted = new MyAVLTree<>(Favourite::getID);
-        youngerFavourites  = new MyAVLTree<>(Favourite::getID);
+        youngerFavourites = new MyAVLTree<>(Favourite::getID);
         dataChecker = new DataChecker();
 
-        Function<Pair<Favourite>,Integer> defaultComp = (Pair<Favourite> pair)
+        Function<Pair<Favourite>, Integer> defaultComp = (Pair<Favourite> pair)
                 -> (pair.left.getID().compareTo(pair.right.getID()));
 
         sorter = new Sorter<>(defaultComp);
@@ -104,13 +104,13 @@ public class FavouriteStore implements IFavouriteStore {
 
             Favourite[] b = intoFavouriteArray(blacklisted.inorder());
 
-            Favourite[] potentials = new Favourite[a.length+ b.length];
-            System.arraycopy(a,0,potentials,0,a.length);
-            System.arraycopy(b,0,potentials,a.length,b.length);
+            Favourite[] potentials = new Favourite[a.length + b.length];
+            System.arraycopy(a, 0, potentials, 0, a.length);
+            System.arraycopy(b, 0, potentials, a.length, b.length);
 
-            for (Favourite f: potentials) {
+            for (Favourite f : potentials) {
                 if (f.getRestaurantID().equals(favourite.getRestaurantID())
-                && f.getCustomerID().equals(favourite.getCustomerID())) {
+                        && f.getCustomerID().equals(favourite.getCustomerID())) {
                     favouriteAVL.insert(f);
                     blacklisted.remove(f);
                     youngerFavourites.remove(f);
@@ -125,7 +125,7 @@ public class FavouriteStore implements IFavouriteStore {
         boolean inside = false;
         boolean insideNewer = false;
         Favourite other = null;
-        for (Favourite f :customersFaves) {
+        for (Favourite f : customersFaves) {
             if (f.getCustomerID().equals(favourite.getCustomerID()) && //Better to short circuit the customer.
                     f.getRestaurantID().equals(favourite.getRestaurantID())) {
                 inside = true;
@@ -156,7 +156,7 @@ public class FavouriteStore implements IFavouriteStore {
         if (favourites == null)
             return false;
         boolean allPassed = true;
-        for (Favourite favourite: favourites)
+        for (Favourite favourite : favourites)
             allPassed = allPassed & addFavourite(favourite); // Important that this doesn't short circuit.
         return allPassed;
     }
@@ -164,7 +164,7 @@ public class FavouriteStore implements IFavouriteStore {
     private Favourite[] intoFavouriteArray(Object[] unCast) {
         Favourite[] arr = new Favourite[unCast.length];
 
-        for (int i=0; i<unCast.length;i++)
+        for (int i = 0; i < unCast.length; i++)
             arr[i] = (Favourite) unCast[i];
 
         return arr;
@@ -191,7 +191,7 @@ public class FavouriteStore implements IFavouriteStore {
         if (id == null)
             return new Favourite[0];
         MyArrayList<Favourite> list = new MyArrayList<>();
-        for (Favourite f: getFavourites()) {
+        for (Favourite f : getFavourites()) {
             if (f.getCustomerID().equals(id))
                 list.add(f);
         }
@@ -207,7 +207,7 @@ public class FavouriteStore implements IFavouriteStore {
         if (id == null)
             return new Favourite[0];
         MyArrayList<Favourite> list = new MyArrayList<>();
-        for (Favourite f: getFavourites()) {
+        for (Favourite f : getFavourites()) {
             if (f.getRestaurantID().equals(id))
                 list.add(f);
         }
@@ -226,15 +226,15 @@ public class FavouriteStore implements IFavouriteStore {
         MyAVLTree<Long, Favourite> c2Fav = new MyAVLTree<>(Favourite::getRestaurantID);
         MyArrayList<Favourite> inCommon = new MyArrayList<>();
 
-        for (Favourite f: getFavouritesByCustomerID(customer1ID)) {
+        for (Favourite f : getFavouritesByCustomerID(customer1ID)) {
             c1Fav.insert(f); // By nature of how faves are stored, this shouldn't ever cause a conflict.
         }
 
-        for (Favourite f: getFavouritesByCustomerID(customer2ID)) {
+        for (Favourite f : getFavouritesByCustomerID(customer2ID)) {
             c2Fav.insert(f);
         }
 
-        for (Favourite f: intoFavouriteArray(c1Fav.inorder())) {
+        for (Favourite f : intoFavouriteArray(c1Fav.inorder())) {
             Long rId = f.getRestaurantID();
             Favourite a = c1Fav.search(rId);
             Favourite b = c2Fav.search(rId);
@@ -253,7 +253,7 @@ public class FavouriteStore implements IFavouriteStore {
 
         Long[] ids = new Long[commonArray.length];
 
-        for (int i=0; i<commonArray.length;i++) {
+        for (int i = 0; i < commonArray.length; i++) {
             ids[i] = commonArray[i].getRestaurantID();
         }
 
@@ -267,15 +267,15 @@ public class FavouriteStore implements IFavouriteStore {
         MyAVLTree<Long, Favourite> c2Fav = new MyAVLTree<>(Favourite::getRestaurantID);
         MyArrayList<Favourite> ADiffB = new MyArrayList<>();
 
-        for (Favourite f: getFavouritesByCustomerID(customer1ID)) {
+        for (Favourite f : getFavouritesByCustomerID(customer1ID)) {
             c1Fav.insert(f); // By nature of how faves are stored, this shouldn't ever cause a conflict.
         }
 
-        for (Favourite f: getFavouritesByCustomerID(customer2ID)) {
+        for (Favourite f : getFavouritesByCustomerID(customer2ID)) {
             c2Fav.insert(f);
         }
 
-        for (Favourite f: intoFavouriteArray(c1Fav.inorder())) {
+        for (Favourite f : intoFavouriteArray(c1Fav.inorder())) {
             Long rId = f.getRestaurantID();
             Favourite a = c1Fav.search(rId);
             Favourite b = c2Fav.search(rId);
@@ -290,7 +290,7 @@ public class FavouriteStore implements IFavouriteStore {
 
         Long[] ids = new Long[diffArray.length];
 
-        for (int i=0; i<diffArray.length;i++) {
+        for (int i = 0; i < diffArray.length; i++) {
             ids[i] = diffArray[i].getRestaurantID();
         }
 
@@ -304,15 +304,15 @@ public class FavouriteStore implements IFavouriteStore {
         MyAVLTree<Long, Favourite> c2Fav = new MyAVLTree<>(Favourite::getRestaurantID);
         MyArrayList<Favourite> notABCommon = new MyArrayList<>();
 
-        for (Favourite f: getFavouritesByCustomerID(customer1ID)) {
+        for (Favourite f : getFavouritesByCustomerID(customer1ID)) {
             c1Fav.insert(f); // By nature of how faves are stored, this shouldn't ever cause a conflict.
         }
 
-        for (Favourite f: getFavouritesByCustomerID(customer2ID)) {
+        for (Favourite f : getFavouritesByCustomerID(customer2ID)) {
             c2Fav.insert(f);
         }
 
-        for (Favourite f: intoFavouriteArray(c1Fav.inorder())) {
+        for (Favourite f : intoFavouriteArray(c1Fav.inorder())) {
             Long rId = f.getRestaurantID();
             Favourite a = c1Fav.search(rId);
             Favourite b = c2Fav.search(rId);
@@ -320,24 +320,24 @@ public class FavouriteStore implements IFavouriteStore {
             if (b == null)
                 notABCommon.add(a);
         }
-        
-        for (Favourite f: intoFavouriteArray(c2Fav.inorder())) {
+
+        for (Favourite f : intoFavouriteArray(c2Fav.inorder())) {
             Long rId = f.getRestaurantID();
             Favourite a = c1Fav.search(rId);
             Favourite b = c2Fav.search(rId);
-            
+
             if (a == null)
                 notABCommon.add(b);
-                
+
         }
-        
+
         Favourite[] diffArray = intoFavouriteArray(notABCommon.getArray());
 
         sorter.sort(diffArray, this::dateComp);
 
         Long[] ids = new Long[diffArray.length];
 
-        for (int i=0; i<diffArray.length;i++) {
+        for (int i = 0; i < diffArray.length; i++) {
             ids[i] = diffArray[i].getRestaurantID();
         }
 
@@ -364,7 +364,7 @@ public class FavouriteStore implements IFavouriteStore {
             for (Favourite f : getFavourites()) {
                 Link link = linkTree.search(which.apply(f));
                 if (link == null)
-                    linkTree.insert(new Link(which.apply(f), f,1));
+                    linkTree.insert(new Link(which.apply(f), f, 1));
                 else {
                     link.fave = f;
                     link.count++;
@@ -373,7 +373,7 @@ public class FavouriteStore implements IFavouriteStore {
             Object[] unCast = linkTree.inorder();
             Link[] arr = new Link[unCast.length];
 
-            for (int i=0;i<unCast.length;i++)
+            for (int i = 0; i < unCast.length; i++)
                 arr[i] = (Link) unCast[i];
 
             linkSorter.sort(arr);
@@ -384,7 +384,7 @@ public class FavouriteStore implements IFavouriteStore {
             if (arr.length < 20)
                 z = arr.length;
 
-            for (int i=0;i<z;i++)
+            for (int i = 0; i < z; i++)
                 top[i] = arr[i].id;
             return top;
         }

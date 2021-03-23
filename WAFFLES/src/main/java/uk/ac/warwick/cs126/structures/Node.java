@@ -1,10 +1,10 @@
 package uk.ac.warwick.cs126.structures;
 
-public class Node<V>{
+public class Node<V> {
     private V val;
     private Node<V> parent;
-    private  Node<V> left;
-    private  Node<V> right;
+    private Node<V> left;
+    private Node<V> right;
 
     public Node(V val, Node<V> left, Node<V> right) {
         this.val = val;
@@ -32,55 +32,55 @@ public class Node<V>{
         this.parent = parent;
     }
 
-    public void setLeft(Node<V> left){
+    public void setLeft(Node<V> left) {
         this.left = left;
         if (!(left == null))
             this.left.setParent(this);
     }
 
-    public void setRight(Node<V> right){
+    public void setRight(Node<V> right) {
         this.right = right;
         if (!(right == null))
             this.right.setParent(this);
     }
 
-    public void setVal(V val){
+    public void setVal(V val) {
         this.val = val;
     }
 
-    public V getVal(){
+    public V getVal() {
         return this.val;
     }
 
-    public Node<V> getParent(){
+    public Node<V> getParent() {
         return this.parent;
     }
 
-    public Node<V> getLeft(){
+    public Node<V> getLeft() {
         return this.left;
     }
 
-    public Node<V> getRight(){
+    public Node<V> getRight() {
         return this.right;
     }
 
-    public Node<V> getSibling(){
+    public Node<V> getSibling() {
         if (parent.getLeft().equals(this))
             return parent.right;
         return parent.left;
     }
 
-    public boolean isExternal(){
+    public boolean isExternal() {
         return this.left == null && this.right == null;
     }
 
-    public int getHeight(){
+    public int getHeight() {
         if (isExternal())
             return 1;
         else if (right == null)
             return 1 + left.getHeight();
         else if (left == null)
-            return  1 + right.getHeight();
+            return 1 + right.getHeight();
         else {
             int a = left.getHeight();
             int b = right.getHeight();
@@ -101,7 +101,7 @@ public class Node<V>{
             return Math.abs(getLeft().getHeight() - getRight().getHeight()) <= 1;
     }
 
-    public void deleteNode(){
+    public void deleteNode() {
         replaceWith(null);
     }
 
