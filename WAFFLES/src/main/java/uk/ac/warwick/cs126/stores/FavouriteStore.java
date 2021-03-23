@@ -1,6 +1,7 @@
 package uk.ac.warwick.cs126.stores;
 
 import uk.ac.warwick.cs126.interfaces.IFavouriteStore;
+import uk.ac.warwick.cs126.models.Customer;
 import uk.ac.warwick.cs126.models.Favourite;
 
 import java.io.*;
@@ -11,6 +12,7 @@ import java.util.function.Function;
 
 import org.apache.commons.io.IOUtils;
 
+import uk.ac.warwick.cs126.models.Restaurant;
 import uk.ac.warwick.cs126.structures.MyAVLTree;
 
 import uk.ac.warwick.cs126.structures.MyArrayList;
@@ -20,12 +22,12 @@ import uk.ac.warwick.cs126.util.Sorter;
 
 public class FavouriteStore implements IFavouriteStore {
 
-    private MyAVLTree<Long,Favourite> favouriteAVL;
-    private MyAVLTree<Long,Favourite> blacklisted;
-    private MyAVLTree<Long, Favourite> youngerFavourites;
-    private DataChecker dataChecker;
-    private Sorter<Favourite> sorter;
-    private Sorter<Link> linkSorter;
+    private final MyAVLTree<Long,Favourite> favouriteAVL;
+    private final MyAVLTree<Long,Favourite> blacklisted;
+    private final MyAVLTree<Long, Favourite> youngerFavourites;
+    private final DataChecker dataChecker;
+    private final Sorter<Favourite> sorter;
+    private final Sorter<Link> linkSorter;
 
     public FavouriteStore() {
         // Initialise variables here
@@ -157,14 +159,6 @@ public class FavouriteStore implements IFavouriteStore {
         for (Favourite favourite: favourites)
             allPassed = allPassed & addFavourite(favourite); // Important that this doesn't short circuit.
         return allPassed;
-    }
-
-    private Favourite[] getCopy(Favourite[] favourites) { // Important to prevent side effects to original array
-        if (favourites == null)
-            return new Favourite[0];
-        Favourite[] copy = new Favourite[favourites.length];
-        System.arraycopy(favourites,0,copy,0,favourites.length);
-        return copy;
     }
 
     private Favourite[] intoFavouriteArray(Object[] unCast) {

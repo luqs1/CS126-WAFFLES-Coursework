@@ -171,7 +171,7 @@ public class CustomerStore implements ICustomerStore {
     }
 
     public Customer[] getCustomersContaining(String searchTerm) {
-        if (searchTerm == null) {
+        if (searchTerm == null || searchTerm.equals("")) {
             return new Customer[0];
         }
         String searchTermProcessed = StringFormatter.
@@ -190,13 +190,7 @@ public class CustomerStore implements ICustomerStore {
                 list.add(customer);
         }
 
-        Customer[] arr2 = new Customer[list.size()]; // Blame that java doesn't allow generic arrays.
-        // I'd use MyArrayList::getArray otherwise.
-
-        for (int i=0;i<arr2.length;i++)
-            arr2[i] = list.get(i);
-
-        return arr2;
+        return intoCustomerArray(list.getArray());
     }
 
 }
