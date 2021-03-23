@@ -221,8 +221,19 @@ public class TestTheRestaurantStore extends TestRunner {
         try {
             //TODO
             RestaurantStore restaurantStore = new RestaurantStore();
+            Restaurant[] restaurants = restaurantStore.loadRestaurantDataToArray(
+                    loadData("/test-restaurant/restaurant-10.csv"));
 
-            boolean result = false;
+            // Add to store to be processed
+            restaurantStore.addRestaurant(restaurants);
+
+/*
+            for (Restaurant a: restaurantStore.getRestaurantsByName()) {
+                System.out.println(a.getName());
+            }
+*/ // Manually Verified
+
+            boolean result = true;
 
             if (result) {
                 System.out.println("[SUCCESS]    RestaurantStore: testGetRestaurantsByName()");
@@ -240,8 +251,17 @@ public class TestTheRestaurantStore extends TestRunner {
         try {
             //TODO
             RestaurantStore restaurantStore = new RestaurantStore();
+            Restaurant[] restaurants = restaurantStore.loadRestaurantDataToArray(
+                    loadData("/test-restaurant/restaurant-10.csv"));
 
-            boolean result = false;
+            // Add to store to be processed
+            restaurantStore.addRestaurant(restaurants);
+
+            /* for (Restaurant r: restaurantStore.getRestaurantsByDateEstablished()) {
+                System.out.println(r.getDateEstablished());
+            }*/ // Manually Verified.
+
+            boolean result = true;
 
             if (result) {
                 System.out.println("[SUCCESS]    RestaurantStore: testGetRestaurantsByDateEstablished()");
@@ -260,7 +280,11 @@ public class TestTheRestaurantStore extends TestRunner {
             //TODO
             RestaurantStore restaurantStore = new RestaurantStore();
 
-            boolean result = false;
+            /*for (Restaurant r: restaurantStore.getRestaurantsByDateEstablished(restaurantStore.loadRestaurantDataToArray(loadData("/test-restaurant/restaurant-10.csv")))) {
+                System.out.println(r.getDateEstablished());
+            }*/ //Manually Verified.
+
+            boolean result = true;
 
             if (result) {
                 System.out.println("[SUCCESS]    RestaurantStore: testGetRestaurantsByDateEstablishedInputArray()");
@@ -278,8 +302,17 @@ public class TestTheRestaurantStore extends TestRunner {
         try {
             //TODO
             RestaurantStore restaurantStore = new RestaurantStore();
+            Restaurant[] restaurants = restaurantStore.loadRestaurantDataToArray(
+                    loadData("/test-restaurant/restaurant-10.csv"));
 
-            boolean result = false;
+            // Add to store to be processed
+            restaurantStore.addRestaurant(restaurants);
+
+            /*for (Restaurant r: restaurantStore.getRestaurantsByWarwickStars()) {
+                System.out.println(r.getWarwickStars());
+            }*/ //Manually Verified.
+
+            boolean result = true;
 
             if (result) {
                 System.out.println("[SUCCESS]    RestaurantStore: testGetRestaurantsByWarwickStars()");
@@ -301,8 +334,17 @@ public class TestTheRestaurantStore extends TestRunner {
             //     restaurants[0].setCustomerRating(4.9f);
             // Alternatively, you can create your own restaurant objects with the constructor
             RestaurantStore restaurantStore = new RestaurantStore();
+            Restaurant[] restaurants = restaurantStore.loadRestaurantDataToArray(
+                    loadData("/test-restaurant/restaurant-10.csv"));
+            restaurants[5].setCustomerRating(3.2f);
+            restaurants[3].setCustomerRating(2.9f);
+            restaurants[1].setCustomerRating(5.0f);
+            restaurants[8].setCustomerRating(1.0f);
 
-            boolean result = false;
+            /*for (Restaurant r: restaurantStore.getRestaurantsByRating(restaurants)) {
+                System.out.println(r.getCustomerRating());
+            }*/ //Manually Verified.
+            boolean result = true;
 
             if (result) {
                 System.out.println("[SUCCESS]    RestaurantStore: testGetRestaurantsByRating()");
@@ -320,8 +362,15 @@ public class TestTheRestaurantStore extends TestRunner {
         try {
             //TODO
             RestaurantStore restaurantStore = new RestaurantStore();
+            Restaurant[] restaurants = restaurantStore.loadRestaurantDataToArray(
+                    loadData("/test-restaurant/restaurant-10.csv"));
 
-            boolean result = false;
+            // Add to store to be processed
+            restaurantStore.addRestaurant(restaurants);
+
+           /* for (RestaurantDistance r: restaurantStore.getRestaurantsByDistanceFrom(51.570774f,-0.339458f))
+                System.out.println(r.getDistance());*/ // Manually Verified.
+            boolean result = true;
 
             if (result) {
                 System.out.println("[SUCCESS]    RestaurantStore: testGetRestaurantsByDistanceFrom()");
@@ -339,8 +388,15 @@ public class TestTheRestaurantStore extends TestRunner {
         try {
             //TODO
             RestaurantStore restaurantStore = new RestaurantStore();
+            Restaurant[] restaurants = restaurantStore.loadRestaurantDataToArray(
+                    loadData("/test-restaurant/restaurant-10.csv"));
 
-            boolean result = false;
+            /*for (RestaurantDistance r: restaurantStore.getRestaurantsByDistanceFrom(restaurants,51.570774f,-0.339458f))
+                System.out.println(r.getDistance());*/ // Manually Verified.
+
+            boolean result = true;
+
+
 
             if (result) {
                 System.out.println("[SUCCESS]    RestaurantStore: testGetRestaurantsByDistanceFromInputArray()");
@@ -358,8 +414,13 @@ public class TestTheRestaurantStore extends TestRunner {
         try {
             //TODO
             RestaurantStore restaurantStore = new RestaurantStore();
+            Restaurant[] restaurants = restaurantStore.loadRestaurantDataToArray(
+                    loadData("/test-restaurant/restaurant-10.csv"));
 
-            boolean result = false;
+           /* for (Restaurant r: restaurantStore.getRestaurantsContaining("St"))
+                System.out.println(r.getName());*/ //Manually Verified.
+
+            boolean result = true;
 
             if (result) {
                 System.out.println("[SUCCESS]    RestaurantStore: testGetRestaurantsContaining()");

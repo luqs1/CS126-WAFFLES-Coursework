@@ -17,6 +17,10 @@ public class MyLinkedList<E> {
         return (head == null);
     }
 
+    public LLElement<E> getHead() {
+        return head;
+    }
+
     public boolean add(E element) {
         // Adds an element to the head of the list.
         LLElement<E> temp = new LLElement<>(element);

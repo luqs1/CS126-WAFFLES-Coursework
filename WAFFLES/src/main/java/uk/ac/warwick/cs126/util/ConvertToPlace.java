@@ -8,15 +8,35 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 
 import org.apache.commons.io.IOUtils;
+import uk.ac.warwick.cs126.structures.LLElement;
+import uk.ac.warwick.cs126.structures.MyAVLTree;
+import uk.ac.warwick.cs126.structures.MyLinkedList;
+import uk.ac.warwick.cs126.structures.Pair;
 
 public class ConvertToPlace implements IConvertToPlace {
+    private MyAVLTree<Float, MyLinkedList<Place>> places;
 
     public ConvertToPlace() {
-        // Initialise things here
+        places = new MyAVLTree<>((MyLinkedList<Place> placeList) -> (placeList.get(0).getLatitude()));
+        for (Place place:getPlacesArray()) {
+            MyLinkedList<Place> thatList =  places.search(place.getLatitude());
+            if (thatList == null) {
+                thatList = new MyLinkedList<>();
+                thatList.add(place);
+                places.insert(thatList);
+            }
+            thatList.add(place);
+        }
     }
 
     public Place convert(float latitude, float longitude) {
-        // TODO
+        MyLinkedList<Place> thesePlaces = places.search(latitude);
+        LLElement<Place> head = thesePlaces.getHead();
+        while (head.getNext() != null) {
+            if (head.getVal().getLongitude() == longitude)
+                return head.getVal();
+            head = head.getNext();
+        }
         return new Place("", "", 0.0f, 0.0f);
     }
 

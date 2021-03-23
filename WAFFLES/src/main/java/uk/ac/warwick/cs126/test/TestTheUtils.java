@@ -8,16 +8,16 @@ public class TestTheUtils extends TestRunner {
         System.out.println("\n[Testing Utils]");
 
         // Run tests, comment out if you want to omit a test, feel free to modify or add more.
-        testConvertToPlace();
-        testDataCheckerOnValidIDAndExtractID();
-        testDataCheckerOnValidCustomer();
-        testDataCheckerOnValidFavourite();
-        testDataCheckerOnValidRestaurant();
-        testDataCheckerOnValidReview();
+        //testConvertToPlace();
+        //testDataCheckerOnValidIDAndExtractID();
+        //testDataCheckerOnValidCustomer();
+        //testDataCheckerOnValidFavourite();
+        //testDataCheckerOnValidRestaurant();
+        //testDataCheckerOnValidReview();
         testHaversineDistanceCalculator();
         testKeywordChecker();
-        testStringFormatterCorrect();
-        testStringFormatterIsFaster();
+        //testStringFormatterCorrect();
+        //testStringFormatterIsFaster();
     }
 
     private void testConvertToPlace() {
@@ -209,6 +209,8 @@ public class TestTheUtils extends TestRunner {
             float distanceInMiles = HaversineDistanceCalculator.inMiles(
                     52.3838f, -1.560065f, 52.379049f, -1.560898f);
 
+            System.out.println(distanceInKM);
+            System.out.println(distanceInMiles);
             boolean result = String.valueOf(distanceInKM).equals("0.5")
                     && String.valueOf(distanceInMiles).equals("0.3");
 

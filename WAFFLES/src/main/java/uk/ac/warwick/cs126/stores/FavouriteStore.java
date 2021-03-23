@@ -347,8 +347,8 @@ public class FavouriteStore implements IFavouriteStore {
     private Integer topComp(Pair<Link> linkPair) {
         int out = linkPair.right.count.compareTo(linkPair.left.count);
         if (out == 0)
-            out = linkPair.right.fave.getDateFavourited().compareTo(
-                    linkPair.left.fave.getDateFavourited()
+            out = linkPair.left.fave.getDateFavourited().compareTo(
+                    linkPair.right.fave.getDateFavourited()
             );
         if (out == 0)
             out = linkPair.left.id.compareTo(linkPair.right.id);
@@ -366,7 +366,8 @@ public class FavouriteStore implements IFavouriteStore {
                 if (link == null)
                     linkTree.insert(new Link(which.apply(f), f, 1));
                 else {
-                    link.fave = f;
+                    if (f.getDateFavourited().compareTo(link.fave.getDateFavourited()) > 0)
+                        link.fave = f;
                     link.count++;
                 }
             }

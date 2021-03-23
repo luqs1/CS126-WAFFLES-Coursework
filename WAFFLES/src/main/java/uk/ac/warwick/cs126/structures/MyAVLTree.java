@@ -280,6 +280,8 @@ public class MyAVLTree<K extends Comparable<K>, V> implements IAVLTree<K, V> {
     }
 
     private MyArrayList<V> inorder(Node<V> node, MyArrayList<V> list) {
+        if (node == null)
+            return list;
         if (node.getLeft() != null)
             inorder(node.getLeft(), list);
         list.add(node.getVal());

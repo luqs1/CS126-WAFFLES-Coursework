@@ -18,6 +18,10 @@ public class TestTheCustomerStore extends TestRunner {
         testGetCustomersContaining();
     }
 
+    public static void main(String[] args) {
+        TestTheCustomerStore a = new TestTheCustomerStore();
+    }
+
     private void testAddCustomer() {
         try {
             // Initialise new store

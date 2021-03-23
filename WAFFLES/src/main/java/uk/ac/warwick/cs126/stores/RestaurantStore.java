@@ -239,8 +239,7 @@ public class RestaurantStore implements IRestaurantStore {
     public RestaurantDistance[] getRestaurantsByDistanceFrom(Restaurant[] restaurants, float latitude, float longitude) {
         if (restaurants == null)
             return new RestaurantDistance[0];
-        Function<Pair<Restaurant>, Integer> distComp = (Pair<Restaurant> pair) ->
-        {
+        Function<Pair<Restaurant>, Integer> distComp = (Pair<Restaurant> pair) -> {
             Restaurant l = pair.left;
             Restaurant r = pair.right;
 

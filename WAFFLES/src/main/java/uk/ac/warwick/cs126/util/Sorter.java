@@ -39,7 +39,7 @@ public class Sorter<V> { // Uses merge sort with different methods
     }
 
     private void sort(Function<Pair<V>, Integer> compareMethod, Object[] array) {
-        if (array.length == 1) {
+        if (array.length <= 1) { // Changed to <= from == to work for empty arrays.
             return;
         }
         Object[] a = new Object[array.length / 2];

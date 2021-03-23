@@ -108,11 +108,15 @@ public class DataChecker implements IDataChecker {
                 restaurant.getWarwickStars(),
                 restaurant.getCustomerRating(),
         };
-        if (anyNull(entries))
+        if (anyNull(entries)) {
+            System.out.println("null");
             return false;
+        }
 
-        if (restaurant.getDateEstablished().compareTo(restaurant.getLastInspectedDate()) > 0)
+        if (restaurant.getDateEstablished().compareTo(restaurant.getLastInspectedDate()) > 0) {
+            System.out.println("DateComp");
             return false;
+        }
 
         boolean validIRating = false;
         for (int i : new int[]{0, 1, 2, 3, 4, 5}) {
@@ -121,8 +125,10 @@ public class DataChecker implements IDataChecker {
                 break;
             }
         }
-        if (!validIRating)
+        if (!validIRating) {
+            System.out.println("Rating");
             return false;
+        }
 
 
         boolean validStars = false;
@@ -131,12 +137,15 @@ public class DataChecker implements IDataChecker {
                 validStars = true;
                 break;
             }
-        if (!validStars)
+        if (!validStars) {
+            System.out.println("Stars");
             return false;
+        }
 
-        if (restaurant.getCustomerRating() != 0.0f
-                || (restaurant.getCustomerRating() >= 1.0f && restaurant.getCustomerRating() <= 5.0f))
+        if (restaurant.getCustomerRating() != 0.0f && !(restaurant.getCustomerRating() >= 1.0f && restaurant.getCustomerRating() <= 5.0f)) {
+            System.out.println("Rating");
             return false;
+        }
 
         restaurant.setID(extractTrueID(restaurant.getRepeatedID()));
         return isValid(restaurant.getID());
