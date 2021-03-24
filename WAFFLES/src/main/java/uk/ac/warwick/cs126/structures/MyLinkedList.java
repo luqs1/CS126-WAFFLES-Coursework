@@ -12,6 +12,18 @@ public class MyLinkedList<E> {
         this.count = 0;
     }
 
+    public Object[] getArray() {
+        Object[] arr = new Object[count];
+        LLElement<E> ptr = head;
+        int i = 0;
+        while (ptr != null) {
+            arr[i] = ptr.getVal();
+            i++;
+            ptr = ptr.getNext();
+        }
+        return arr;
+    }
+
     public boolean isEmpty() {
         // Returns whether the list is empty.
         return (head == null);

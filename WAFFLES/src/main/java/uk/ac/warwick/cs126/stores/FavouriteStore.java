@@ -8,6 +8,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.function.Function;
 
 import org.apache.commons.io.IOUtils;
@@ -16,6 +17,7 @@ import uk.ac.warwick.cs126.models.Restaurant;
 import uk.ac.warwick.cs126.structures.MyAVLTree;
 
 import uk.ac.warwick.cs126.structures.MyArrayList;
+import uk.ac.warwick.cs126.structures.MyLinkedList;
 import uk.ac.warwick.cs126.structures.Pair;
 import uk.ac.warwick.cs126.util.DataChecker;
 import uk.ac.warwick.cs126.util.Sorter;
@@ -23,15 +25,26 @@ import uk.ac.warwick.cs126.util.Sorter;
 public class FavouriteStore implements IFavouriteStore {
 
     private final MyAVLTree<Long, Favourite> favouriteAVL;
+    private final MyAVLTree<Long, MyArrayList<Favourite>> customersAVL;
     private final MyAVLTree<Long, Favourite> blacklisted;
     private final MyAVLTree<Long, Favourite> youngerFavourites;
     private final DataChecker dataChecker;
     private final Sorter<Favourite> sorter;
     private final Sorter<Link> linkSorter;
 
+    public static void main(String[] args) {
+        FavouriteStore favouriteStore = new FavouriteStore();
+        Favourite a = new Favourite(1112223334445556L,1234567891234567L,1234567891234567L, new Date());
+        Favourite b = new Favourite(2223334445556667L,1234567891234567L,1264567891234567L, new Date());
+
+        favouriteStore.addFavourite(a);
+        favouriteStore.addFavourite(b);
+    }
+
     public FavouriteStore() {
         // Initialise variables here
         favouriteAVL = new MyAVLTree<>(Favourite::getID);
+        customersAVL = new MyAVLTree<>((MyArrayList<Favourite> list) -> (list.get(0).getCustomerID()));
         blacklisted = new MyAVLTree<>(Favourite::getID);
         youngerFavourites = new MyAVLTree<>(Favourite::getID);
         dataChecker = new DataChecker();
@@ -92,13 +105,46 @@ public class FavouriteStore implements IFavouriteStore {
         return favouriteArray;
     }
 
+    private boolean addCustomersAVL(Favourite favourite) {
+        MyArrayList<Favourite> list = customersAVL.search(favourite.getCustomerID());
+        if (list == null) {
+            list = new MyArrayList<>();
+            list.add(favourite);
+            return customersAVL.insert(list);
+        }
+        return list.add(favourite);
+    }
+
+    private boolean removeCustomersAVL(Favourite favourite){
+        MyArrayList<Favourite> list = customersAVL.search(favourite.getCustomerID());
+        if (list == null)
+            return false;
+        if (list.size() == 1)
+            customersAVL.remove(favourite.getCustomerID());
+        else
+            list.remove(favourite);
+        return true;
+    }
+
+    private boolean add(Favourite favourite) {
+        if (favourite == null)
+            return false;
+        return favouriteAVL.insert(favourite) & addCustomersAVL(favourite);
+    }
+
+    private boolean remove(Favourite favourite){
+        if (favourite == null)
+            return false;
+        return removeCustomersAVL(favourite) & favouriteAVL.remove(favourite);
+    }
+
     public boolean addFavourite(Favourite favourite) {
         if (!dataChecker.isValid(favourite) || blacklisted.search(favourite))
             return false;
 
         if (favouriteAVL.search(favourite)) {
             blacklisted.insert(favourite);
-            favouriteAVL.remove(favourite);
+            remove(favourite);
 
             Favourite[] a = intoFavouriteArray(youngerFavourites.inorder());
 
@@ -111,7 +157,7 @@ public class FavouriteStore implements IFavouriteStore {
             for (Favourite f : potentials) {
                 if (f.getRestaurantID().equals(favourite.getRestaurantID())
                         && f.getCustomerID().equals(favourite.getCustomerID())) {
-                    favouriteAVL.insert(f);
+                    add(f);
                     blacklisted.remove(f);
                     youngerFavourites.remove(f);
                     break;
@@ -122,36 +168,35 @@ public class FavouriteStore implements IFavouriteStore {
         }
 
         // There is a problem in this code:
-        /*Favourite[] customersFaves = getFavouritesByCustomerID(favourite.getCustomerID());
+        MyArrayList<Favourite> customers = customersAVL.search(favourite.getCustomerID());
+        if (customers == null)
+            return add(favourite);
+        Favourite[] customersFaves = intoFavouriteArray(customers.getArray());
+
         boolean inside = false;
         boolean insideNewer = false;
         Favourite other = null;
         for (Favourite f : customersFaves) {
-            if (f.getCustomerID().equals(favourite.getCustomerID()) && //Better to short circuit the customer.
-                    f.getRestaurantID().equals(favourite.getRestaurantID())) {
+            if (f.getRestaurantID().equals(favourite.getRestaurantID())) {
                 inside = true;
-                if (f.getDateFavourited().compareTo(favourite.getDateFavourited()) > 0) {
+                    if (f.getDateFavourited().compareTo(favourite.getDateFavourited()) > 0) {
                     insideNewer = true;
                     other = f;
                 }
             }
         }
 
-        if (!inside) {
-            favouriteAVL.insert(favourite);
-            return true;
-        }
+        if (!inside)
+            return add(favourite);
 
         if (insideNewer) {
-            favouriteAVL.remove(other);
+            remove(other);
             blacklisted.insert(other);
-            favouriteAVL.insert(favourite);
+            add(favourite);
             return true;
         }
 
         youngerFavourites.insert(favourite);
-         */
-        favouriteAVL.insert(favourite);
         return false;
     }
 
@@ -193,17 +238,10 @@ public class FavouriteStore implements IFavouriteStore {
     public Favourite[] getFavouritesByCustomerID(Long id) {
         if (id == null)
             return new Favourite[0];
-        MyArrayList<Favourite> list = new MyArrayList<>();
-        for (Favourite f : getFavourites()) {
-            if (f.getCustomerID().equals(id))
-                list.add(f);
-        }
-
-        Favourite[] out = intoFavouriteArray(list.getArray());
-
-        sorter.sort(out, this::dateComp);
-
-        return out;
+        MyArrayList<Favourite> list = customersAVL.search(id);
+        if (list == null)
+            return new Favourite[0];
+        return intoFavouriteArray(list.getArray());
     }
 
     public Favourite[] getFavouritesByRestaurantID(Long id) {

@@ -15,9 +15,9 @@ public class TestRunner {
         // Initialise and run tests, comment out if you want to omit those tests
          new TestTheConstructorsAndInitializers();
          new TestTheCustomerStore(); //Passed
-         new TestTheFavouriteStore(); // Passed
+         new TestTheFavouriteStore(); // Nope
          new TestTheRestaurantStore(); // Passed
-        // new TestTheReviewStore();
+         new TestTheReviewStore();
          new TestTheUtils();
     }
 

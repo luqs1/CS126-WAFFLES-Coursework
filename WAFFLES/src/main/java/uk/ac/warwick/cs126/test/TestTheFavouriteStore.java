@@ -21,6 +21,10 @@ public class TestTheFavouriteStore extends TestRunner {
         testGetTopCustomersByFavouriteCount();
     }
 
+    public static void main(String[] args) {
+        new TestTheFavouriteStore();
+    }
+
     private void testAddFavourite() {
         try {
             // Initialise new store
