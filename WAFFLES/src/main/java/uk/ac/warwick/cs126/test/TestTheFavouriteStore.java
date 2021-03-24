@@ -183,8 +183,8 @@ public class TestTheFavouriteStore extends TestRunner {
             // Add to store to be processed
             favouriteStore.addFavourite(favourites);
 
-            /*for (Favourite favourite: favouriteStore.getFavouritesByCustomerID(favourites[0].getCustomerID()))
-                System.out.println(favourite);*/ // Manually Verified.
+            for (Favourite favourite: favouriteStore.getFavouritesByCustomerID(favourites[0].getCustomerID()))
+                System.out.println(favourite); // Manually Verified.
 
             boolean result = true;
 
@@ -211,8 +211,8 @@ public class TestTheFavouriteStore extends TestRunner {
             // Add to store to be processed
             favouriteStore.addFavourite(favourites);
 
-            /*for (Favourite favourite: favouriteStore.getFavouritesByRestaurantID(favourites[0].getRestaurantID()))
-                System.out.println(favourite);*/ // Manually Verified.
+            for (Favourite favourite: favouriteStore.getFavouritesByRestaurantID(favourites[0].getRestaurantID()))
+                System.out.println(favourite); // Manually Verified.
             boolean result = true;
 
             if (result) {
@@ -238,9 +238,9 @@ public class TestTheFavouriteStore extends TestRunner {
             // Add to store to be processed
             favouriteStore.addFavourite(favourites);
 
-           /* for (Long id: favouriteStore.getCommonFavouriteRestaurants(
+            for (Long id: favouriteStore.getCommonFavouriteRestaurants(
                     favourites[0].getCustomerID(),favourites[2].getCustomerID()))
-                System.out.println(id);*/ // Manually Verified.
+                System.out.println(id); // Manually Verified.
             boolean result = true;
 
             if (result) {
@@ -266,9 +266,9 @@ public class TestTheFavouriteStore extends TestRunner {
             // Add to store to be processed
             favouriteStore.addFavourite(favourites);
 
-           /* for (Long id: favouriteStore.getMissingFavouriteRestaurants(favourites[3].getCustomerID(),
+            for (Long id: favouriteStore.getMissingFavouriteRestaurants(favourites[3].getCustomerID(),
                     favourites[1].getCustomerID()))
-                    System.out.println(id);*/ // Manually Verified.
+                    System.out.println(id); // Manually Verified.
 
             boolean result = true;
 
@@ -324,8 +324,8 @@ public class TestTheFavouriteStore extends TestRunner {
             // Add to store to be processed
             favouriteStore.addFavourite(favourites);
 
-          /*  for (Long id: favouriteStore.getTopCustomersByFavouriteCount())
-                System.out.println(id);*/ // Manually Verified.
+            for (Long id: favouriteStore.getTopCustomersByFavouriteCount())
+                System.out.println(id); // Manually Verified.
 
             boolean result = true;
 
@@ -352,8 +352,8 @@ public class TestTheFavouriteStore extends TestRunner {
             // Add to store to be processed
             favouriteStore.addFavourite(favourites);
 
-            /*for (Long id: favouriteStore.getTopRestaurantsByFavouriteCount())
-                System.out.println(id);*/ // Manually Verified.
+            for (Long id: favouriteStore.getTopRestaurantsByFavouriteCount())
+                System.out.println(id); // Manually Verified.
             boolean result = true;
 
             if (result) {

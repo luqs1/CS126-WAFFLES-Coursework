@@ -86,6 +86,8 @@ public class Node<V> {
             else
                 height = 1 + a;
         }
+        if (parent != null) // This was very important.
+            parent.reCalculateHeight();
     }
 
     public int getHeight() {

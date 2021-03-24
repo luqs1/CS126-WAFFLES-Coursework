@@ -1,7 +1,6 @@
 package uk.ac.warwick.cs126.stores;
 
 import uk.ac.warwick.cs126.interfaces.IFavouriteStore;
-import uk.ac.warwick.cs126.models.Customer;
 import uk.ac.warwick.cs126.models.Favourite;
 
 import java.io.*;
@@ -13,11 +12,9 @@ import java.util.function.Function;
 
 import org.apache.commons.io.IOUtils;
 
-import uk.ac.warwick.cs126.models.Restaurant;
 import uk.ac.warwick.cs126.structures.MyAVLTree;
 
 import uk.ac.warwick.cs126.structures.MyArrayList;
-import uk.ac.warwick.cs126.structures.MyLinkedList;
 import uk.ac.warwick.cs126.structures.Pair;
 import uk.ac.warwick.cs126.util.DataChecker;
 import uk.ac.warwick.cs126.util.Sorter;
@@ -27,7 +24,8 @@ public class FavouriteStore implements IFavouriteStore {
     private final MyAVLTree<Long, Favourite> favouriteAVL;
     private final MyAVLTree<Long, MyArrayList<Favourite>> customersAVL;
     private final MyAVLTree<Long, Favourite> blacklisted;
-    private final MyAVLTree<Long, Favourite> youngerFavourites;
+    private final MyAVLTree<Long, MyArrayList<Favourite>> bCustomersAVL;
+    private final MyAVLTree<Long, MyArrayList<Favourite>> youngerAVL;
     private final DataChecker dataChecker;
     private final Sorter<Favourite> sorter;
     private final Sorter<Link> linkSorter;
@@ -46,7 +44,8 @@ public class FavouriteStore implements IFavouriteStore {
         favouriteAVL = new MyAVLTree<>(Favourite::getID);
         customersAVL = new MyAVLTree<>((MyArrayList<Favourite> list) -> (list.get(0).getCustomerID()));
         blacklisted = new MyAVLTree<>(Favourite::getID);
-        youngerFavourites = new MyAVLTree<>(Favourite::getID);
+        bCustomersAVL = new MyAVLTree<>((MyArrayList<Favourite> list) -> (list.get(0).getCustomerID()));
+        youngerAVL = new MyAVLTree<>((MyArrayList<Favourite> list) -> (list.get(0).getCustomerID()));
         dataChecker = new DataChecker();
 
         Function<Pair<Favourite>, Integer> defaultComp = (Pair<Favourite> pair)
@@ -105,22 +104,22 @@ public class FavouriteStore implements IFavouriteStore {
         return favouriteArray;
     }
 
-    private boolean addCustomersAVL(Favourite favourite) {
-        MyArrayList<Favourite> list = customersAVL.search(favourite.getCustomerID());
+    private boolean addArrayAVL(Favourite favourite, MyAVLTree<Long,MyArrayList<Favourite>> arrayAVL) {
+        MyArrayList<Favourite> list = arrayAVL.search(favourite.getCustomerID());
         if (list == null) {
             list = new MyArrayList<>();
             list.add(favourite);
-            return customersAVL.insert(list);
+            return arrayAVL.insert(list);
         }
         return list.add(favourite);
     }
 
-    private boolean removeCustomersAVL(Favourite favourite){
-        MyArrayList<Favourite> list = customersAVL.search(favourite.getCustomerID());
+    private boolean removeArrayAVL(Favourite favourite, MyAVLTree<Long,MyArrayList<Favourite>> arrayAVL){
+        MyArrayList<Favourite> list = arrayAVL.search(favourite.getCustomerID());
         if (list == null)
             return false;
         if (list.size() == 1)
-            customersAVL.remove(favourite.getCustomerID());
+            arrayAVL.remove(favourite.getCustomerID());
         else
             list.remove(favourite);
         return true;
@@ -129,75 +128,80 @@ public class FavouriteStore implements IFavouriteStore {
     private boolean add(Favourite favourite) {
         if (favourite == null)
             return false;
-        return favouriteAVL.insert(favourite) & addCustomersAVL(favourite);
+        return favouriteAVL.insert(favourite) & addArrayAVL(favourite, customersAVL);
     }
 
     private boolean remove(Favourite favourite){
         if (favourite == null)
             return false;
-        return removeCustomersAVL(favourite) & favouriteAVL.remove(favourite);
+        return favouriteAVL.remove(favourite) & removeArrayAVL(favourite, customersAVL);
     }
 
-    public boolean addFavourite(Favourite favourite) {
-        if (!dataChecker.isValid(favourite) || blacklisted.search(favourite))
+    private boolean bAdd(Favourite favourite) {
+        if (favourite == null)
+            return false;
+        return blacklisted.insert(favourite) & addArrayAVL(favourite,bCustomersAVL);
+    }
+
+    private boolean bRemove(Favourite favourite) {
+        if (favourite == null)
+            return false;
+        return blacklisted.remove(favourite) & removeArrayAVL(favourite, bCustomersAVL);
+    }
+
+    public boolean addFavourite(Favourite favourite) { //TODO: This has to be the problem right?
+        if (!dataChecker.isValid(favourite) || blacklisted.search(favourite)) //Invalid
             return false;
 
-        if (favouriteAVL.search(favourite)) {
-            blacklisted.insert(favourite);
+        if (favouriteAVL.search(favourite)) { //Needs to be blacklisted. Was inside favourites.
+            bAdd(favourite) ;
             remove(favourite);
-
-            Favourite[] a = intoFavouriteArray(youngerFavourites.inorder());
-
-            Favourite[] b = intoFavouriteArray(blacklisted.inorder());
-
-            Favourite[] potentials = new Favourite[a.length + b.length];
-            System.arraycopy(a, 0, potentials, 0, a.length);
-            System.arraycopy(b, 0, potentials, a.length, b.length);
-
-            for (Favourite f : potentials) {
-                if (f.getRestaurantID().equals(favourite.getRestaurantID())
-                        && f.getCustomerID().equals(favourite.getCustomerID())) {
-                    add(f);
-                    blacklisted.remove(f);
-                    youngerFavourites.remove(f);
-                    break;
+/*
+            Favourite[] bFaves =  intoFavouriteArray(bCustomersAVL.search(favourite.getCustomerID()).getArray());
+            for (Favourite fave: bFaves) {
+                if (fave.getRestaurantID().equals(favourite.getRestaurantID())) {
+                    add(fave);
+                    bRemove(fave);
+                    return false; //Got blacklisted. Replacement found.
                 }
             }
 
-            return false;
+            Favourite[] yFaves = intoFavouriteArray(youngerAVL.search(favourite.getCustomerID()).getArray());
+
+            for (Favourite fave: yFaves) {
+                if (fave.getRestaurantID().equals(favourite.getRestaurantID())) {
+                    add(fave);
+                    bRemove(fave);
+                    return false; // Got blacklisted. Replacement found.
+                }
+            }*/
+            return false; // No replacement found.
+
+
         }
+        // Considering adding. Wasn't in favourites.
 
-        // There is a problem in this code:
-        MyArrayList<Favourite> customers = customersAVL.search(favourite.getCustomerID());
-        if (customers == null)
-            return add(favourite);
-        Favourite[] customersFaves = intoFavouriteArray(customers.getArray());
+       /* MyArrayList<Favourite> fromCustomer = customersAVL.search(favourite.getCustomerID());
+        if (fromCustomer == null) // Customer doesn't have any favourites stored.
+            return add(favourite); // End by adding.
 
-        boolean inside = false;
-        boolean insideNewer = false;
-        Favourite other = null;
-        for (Favourite f : customersFaves) {
-            if (f.getRestaurantID().equals(favourite.getRestaurantID())) {
-                inside = true;
-                    if (f.getDateFavourited().compareTo(favourite.getDateFavourited()) > 0) {
-                    insideNewer = true;
-                    other = f;
+        for (Favourite fave: intoFavouriteArray(fromCustomer.getArray())) {
+            if (fave.getRestaurantID().equals(favourite.getRestaurantID())) {// Colliding fave found.
+                if (fave.getDateFavourited().compareTo(favourite.getDateFavourited()) > 0) { // The favourite is older
+                    addArrayAVL(fave,youngerAVL);
+                    remove(fave);
+                    add(favourite);
+                    return true;
+                }
+                else { // The fave is older
+                    addArrayAVL(favourite, youngerAVL);
+                    return false;
                 }
             }
-        }
-
-        if (!inside)
-            return add(favourite);
-
-        if (insideNewer) {
-            remove(other);
-            blacklisted.insert(other);
-            add(favourite);
-            return true;
-        }
-
-        youngerFavourites.insert(favourite);
-        return false;
+        }*/
+        // No collisions found
+        add(favourite);
+        return true;
     }
 
     public boolean addFavourite(Favourite[] favourites) {
@@ -210,6 +214,8 @@ public class FavouriteStore implements IFavouriteStore {
     }
 
     private Favourite[] intoFavouriteArray(Object[] unCast) {
+        if (unCast == null)
+            return new Favourite[0];
         Favourite[] arr = new Favourite[unCast.length];
 
         for (int i = 0; i < unCast.length; i++)

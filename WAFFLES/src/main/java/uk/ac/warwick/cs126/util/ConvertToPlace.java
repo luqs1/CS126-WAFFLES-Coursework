@@ -14,7 +14,7 @@ import uk.ac.warwick.cs126.structures.MyLinkedList;
 import uk.ac.warwick.cs126.structures.Pair;
 
 public class ConvertToPlace implements IConvertToPlace {
-    private MyAVLTree<Float, MyLinkedList<Place>> places;
+    private final MyAVLTree<Float, MyLinkedList<Place>> places;
 
     public ConvertToPlace() {
         places = new MyAVLTree<>((MyLinkedList<Place> placeList) -> (placeList.get(0).getLatitude()));

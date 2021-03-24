@@ -11,17 +11,55 @@ public class MyAVLTree<K extends Comparable<K>, V> implements IAVLTree<K, V> {
 
     public static void main(String[] args) {
         // Test
-        MyAVLTree<Integer, String> strings = new MyAVLTree<>(String::length);
-        strings.insert("Sam");
-        strings.insert("Anton");
-        strings.insert("Elizabeth");
-        strings.remove(5);
-        strings.insert("Alice");
-        strings.insert("Luqmaan");
-        strings.remove(3);
-        System.out.println(strings.search("Sam"));
+        MyAVLTree<String , String> strings = new MyAVLTree<>(a -> a);
+        System.out.println();
+        String[] names = {
+                "Adam",
+                "Raeed",
+                "Macintosh",
+                "Lizzie",
+                "Annie",
+                "Jack",
+                "Carnegie",
+                "Julian",
+                "Aliyah",
+                "Torvalds",
+                "Peter",
+                "Lin Ming",
+                "Shi Xia",
+                "Luqmaan",
+                "George",
+                "Asma",
+                "Pauline",
+                "Sana",
+                "Fiora",
+                "Shyvana",
+                "Sylas",
+                "Benedict",
+                "Zoro",
+                "Nami",
+                "Luffy",
+                "Nile",
+                "Morgana",
+                "Lydia",
+                "Sylas",
+                "Jinx",
+                "Darius",
+                "Nina",
+                "Timothy",
+                "John",
+                "Heisenberg",
+                "Matthew",
+        };
 
-        System.out.println(strings);
+        for (String name: names) {
+            strings.insert(name);
+            System.out.println(strings.root.getHeight());
+        }
+
+        for (Object name: strings.inorder())
+            System.out.println(name);
+        System.out.println(strings.root);
     }
 
     public String toString() {
@@ -83,12 +121,11 @@ public class MyAVLTree<K extends Comparable<K>, V> implements IAVLTree<K, V> {
         return true;
     }
 
-    private void removeRes(Node<V> ptr) {
+    private void removeRes(Node<V> ptr) { // TODO: Needs work
         while (ptr.balanced() || ptr.getHeight() < 3) {
             if (ptr.getParent() == null) {
                 return;
             }
-            ptr = ptr.getParent();
         }
         Node<V> child;
         if (ptr.getRight() == null)
@@ -111,7 +148,7 @@ public class MyAVLTree<K extends Comparable<K>, V> implements IAVLTree<K, V> {
             grandchild = ptr.getLeft();
 
         // Going to believe by induction that grandchild or child cant be null cus unbalanced.
-
+        System.out.println("Remove Restructuring.");
         triRes(ptr, child, grandchild);
 
 
