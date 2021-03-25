@@ -1,9 +1,40 @@
-# CS126 WAFFLES Coursework Report [1234567]
+# CS126 WAFFLES Coursework Report [2003231]
 <!-- This document gives a brief overview about your solution.  -->
 <!-- You should change number in the title to your university ID number.  -->
 <!-- You should delete these comments  -->
 <!-- And for the latter sections should delete and write your explanations in them. -->
 <!-- # <-- Indicates heading, ## <-- Indicates subheading, and so on -->
+
+## Data Structures
+The most important data structure I've used in this coursework is my `AVLTree` implementation. I also had to build a `Node` implementation as a prerequisite.
+
+### Why not a `HashMap`?
+
+I was contemplating whether to use an `AVLTree` or a `HashMap`; whilst I thought a `HashMap` would be easier to implement giving me more time to work on the Stores, I thought it had some points that needed addressing.
+
+1. Setting the initial size.
+2. Rebuilding the internal array once it became too full.
+
+Point 1: HashMaps work best when there's a prime number of array spaces and/ or when we have well defined hashing functions. A combination of both can lead to an amortised O(1) add/ delete which is desirable. However, it is hard to know how many elements will be in a `HashMap` (which is a major factor in deciding initial size) its even harder to calculate a prime number in that vicinity. The second point can be addressed by having a static array of many prime numbers but I still find this solution inelegant.
+
+Point 2: When the HashMap inevitably has to resize, it is important to consider how costly an operation it might be if you want to spread out the previous elements in the new array. It's possible that one can come up with a simplification so that the hash doesn't need to be reapplied to every element but again I find this hasslesome.
+
+### Benefits of `AVLTree`
+
+The amount of human coding time that was required to build the `AVLTree` cannot be understated, and testing to see if it worked adequately was equally challenging. However, it is labor well spent. The `AVLTree` has O(logn) add/ delete and search. Most importantly however, it is consistent, requires no additional rebalancing/ resizing and works in various circumstances.
+
+If I simply used a BST, I'd be gambling on the time complexity. The `AVLTree`'s _self-balancing_ means that it would take longer that if it didnt have to balance itself, but it gurantees performance of O(logn).
+
+### My Implementation
+The type of my `AVLTree` is `AVLTree<K extends Comparable<K>, V>`, it also requires a `Function<V, K>` at initialisation. To summarise, I can store non-comparable values with comparable keys, providing I give a function that instructs the Tree how to get the key `K` from the value `V`. With the restriction that `K` is unique relative to the rest of the tree.
+
+For example: `MyAVLTree<Integer, String> customers = new MyAVLTree<>(Customer::getID())` would allow me to store Customers (not comparable) and use their IDs (comparable and unique) as keys. This provides the additional benefit that if I want a `Customer[]` in order of their IDs, i can simply do an `inorder` traversal.
+
+### Sorter
+The sorter is a tool to use binary sort on an array. I noticed once again that it would be wasteful to only work on `Comparable` elements or to even insist on only a select way of comparing two elements even if they were `Comparable`. So my sorter would ask for a function `Function<Pair<V>, Integer>` where a `Pair<V>` is just two elements of type `V` (the two being compared). This function works in the same spirit as a comparator and allows me to use comparators on different attributes of whatever I'm sorting. This proved very versatile and was of great aid in implementing the Stores.
+
+
+
 
 ## CustomerStore
 ### Overview
@@ -12,9 +43,8 @@
 <!-- * <- is a bullet point, you can also use - minuses or + pluses instead -->
 <!-- And this is *italic* and this is **bold** -->
 <!-- Words in the grave accents, or in programming terms backticks, formats it as code: `put code here` -->
-* I have used an `ArrayList` structure to store and process customers because it was easy to implement. 
-* I used `BubbleSort` to sort customers by name and ID because I want my code to be inefficient. 
-
+* 
+* 
 ### Space Complexity
 <!-- Write here what you think the overall store space complexity is and gives a brief reason why. -->
 <!-- <br> gives a line break -->
