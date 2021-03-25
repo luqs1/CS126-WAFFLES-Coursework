@@ -247,7 +247,7 @@ public class FavouriteStore implements IFavouriteStore {
         MyArrayList<Favourite> list = customersAVL.search(id);
         if (list == null)
             return new Favourite[0];
-        return intoFavouriteArray(list.getArray());
+        return sorter.sort(intoFavouriteArray(list.getArray()), this::dateComp);
     }
 
     public Favourite[] getFavouritesByRestaurantID(Long id) {
