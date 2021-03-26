@@ -1,6 +1,7 @@
 package uk.ac.warwick.cs126.util;
 
 import uk.ac.warwick.cs126.interfaces.IKeywordChecker;
+import uk.ac.warwick.cs126.structures.MyAVLTree;
 
 public class KeywordChecker implements IKeywordChecker {
     private static final String[] keywords = {
@@ -88,12 +89,24 @@ public class KeywordChecker implements IKeywordChecker {
             "yummy"
     };
 
+    private static final MyAVLTree<Integer, String> keywordsAVL;
+
+    static {
+        keywordsAVL = new MyAVLTree<>(String::hashCode);
+        for (String str: keywords)
+            keywordsAVL.insert(str);
+    }
+
     public KeywordChecker() {
         // Initialise things here
     }
 
     public boolean isAKeyword(String word) {
-        // TODO
-        return false;
+        return keywordsAVL.search(word);
+    }
+
+    public boolean enhancedCheck(String word) {
+        word = word.replaceAll("(\\. | \\? | ! | ; | : | # )","").toLowerCase();
+        return isAKeyword(word);
     }
 }

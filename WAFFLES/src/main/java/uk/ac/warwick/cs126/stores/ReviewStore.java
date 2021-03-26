@@ -1,13 +1,14 @@
 package uk.ac.warwick.cs126.stores;
 
 import uk.ac.warwick.cs126.interfaces.IReviewStore;
-import uk.ac.warwick.cs126.models.Favourite;
+import uk.ac.warwick.cs126.models.Restaurant;
 import uk.ac.warwick.cs126.models.Review;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.function.Function;
 
 import org.apache.commons.io.IOUtils;
@@ -17,7 +18,9 @@ import uk.ac.warwick.cs126.structures.MyArrayList;
 
 import uk.ac.warwick.cs126.structures.Pair;
 import uk.ac.warwick.cs126.util.DataChecker;
+import uk.ac.warwick.cs126.util.KeywordChecker;
 import uk.ac.warwick.cs126.util.Sorter;
+import uk.ac.warwick.cs126.util.StringFormatter;
 
 public class ReviewStore implements IReviewStore {
 
@@ -25,24 +28,54 @@ public class ReviewStore implements IReviewStore {
     private MyAVLTree<Long, Review> blacklisted;
     private MyAVLTree<Long, MyArrayList<Review>> customersRevAVL;
     private MyAVLTree <Long, MyArrayList<Review>> bCustomersRevAVL;
-    private MyAVLTree<Long, MyArrayList<Review>> olderCustomerRevAVL;
+    private MyAVLTree<Long, MyArrayList<Review>> OlderCustomerRevAVL;
     private Sorter<Review> sorter;
     private final DataChecker dataChecker;
+    private final Sorter<RLink> linkSorter;
+    private final Sorter<RestaurantRating> rrSorter;
+    private final Sorter<KeywordCounter> kwSorter;
+    private final KeywordChecker keywordChecker;
 
     public ReviewStore() {
         // Initialise variables here
-        MyAVLTree<Long, Review> reviewAVL = new MyAVLTree<>(Review::getID);
-        MyAVLTree<Long, Review> blacklisted = new MyAVLTree<>(Review::getID);
+        reviewAVL = new MyAVLTree<>(Review::getID);
+        blacklisted = new MyAVLTree<>(Review::getID);
 
         Function<MyArrayList<Review>, Long> listAVLFunc = (MyArrayList<Review> list) -> list.get(0).getID();
 
-        MyAVLTree<Long, MyArrayList<Review>> customersRevAVL = new MyAVLTree<>(listAVLFunc);
-        MyAVLTree<Long, MyArrayList<Review>> bCustomersRevAVL = new MyAVLTree<>(listAVLFunc);
-        MyAVLTree<Long, MyArrayList<Review>> OlderCustomerRevAVL = new MyAVLTree<>(listAVLFunc);
+        customersRevAVL = new MyAVLTree<>(listAVLFunc);
+        bCustomersRevAVL = new MyAVLTree<>(listAVLFunc);
+        OlderCustomerRevAVL = new MyAVLTree<>(listAVLFunc);
 
-        Sorter<Review> sorter = new Sorter<>((Pair<Review> pair) -> pair.left.getID().compareTo(pair.right.getID()));
+        sorter = new Sorter<>((Pair<Review> pair) -> pair.left.getID().compareTo(pair.right.getID()));
+        rrSorter = new Sorter<>((Pair<RestaurantRating> rrPair) -> {
+            int out;
+            if (rrPair.left.totalRating == 0 && rrPair.right.totalRating == 0)
+                    return dateComp(new Pair<>(rrPair.left.latestReview, rrPair.right.latestReview));
+            else if (rrPair.left.totalRating == 0)
+                out = -1;
+            else if (rrPair.right.totalRating == 0)
+                out = 1;
+            else {
+                float av1 = rrPair.left.totalRating / (float) rrPair.left.count;
+                float av2 = rrPair.right.totalRating/ (float) rrPair.right.count;
+                out = Float.compare(av2,av1);
+            }
+            return out;
+        }
+        );
+        linkSorter = new Sorter<>(this::topComp);
+        kwSorter = new Sorter<>((Pair<KeywordCounter> pairKC) -> {
+            int out = Integer.compare(pairKC.right.count ,pairKC.left.count);
+            if (out == 0)
+                out = pairKC.left.keyword.compareTo(pairKC.right.keyword);
+            return out;
+        });
+
 
         dataChecker = new DataChecker();
+        keywordChecker = new KeywordChecker();
+
     }
 
     public Review[] loadReviewDataToArray(InputStream resource) {
@@ -283,49 +316,208 @@ public class ReviewStore implements IReviewStore {
     }
 
     public float getAverageCustomerReviewRating(Long id) {
-        // TODO
-        return 0.0f;
+        Review[] all = getReviewsByCustomerID(id);
+        if (all.length == 0)
+            return 0.0f;
+        float ratingSum = 0f;
+        for (Review review: all)
+            ratingSum += review.getRating();
+        return ratingSum/ all.length;
     }
 
     public float getAverageRestaurantReviewRating(Long id) {
-        // TODO
-        return 0.0f;
+        Review[] all = getReviewsByRestaurantID(id);
+        if (all.length == 0)
+            return 0.0f;
+        float ratingSum = 0f;
+        for (Review review: all)
+            ratingSum += review.getRating();
+        return ratingSum / all.length;
     }
 
     public int[] getCustomerReviewHistogramCount(Long id) {
-        // TODO
-        return new int[5];
+        Review[] all = getReviewsByCustomerID(id);
+        int[] counts = new int[5];
+        for (Review review: all)
+            counts[review.getRating()]++;
+        return counts;
     }
 
     public int[] getRestaurantReviewHistogramCount(Long id) {
-        // TODO
-        return new int[5];
+        Review[] all = getReviewsByRestaurantID(id);
+        int[] counts = new int[5];
+        for (Review review: all)
+            counts[review.getRating()]++;
+        return counts;
     }
 
     public Long[] getTopCustomersByReviewCount() {
-        // TODO
-        return new Long[20];
+        return getTop(Review::getCustomerID);
     }
 
     public Long[] getTopRestaurantsByReviewCount() {
-        // TODO
-        return new Long[20];
+        return getTop(Review::getRestaurantID);
+    }
+
+    private Integer topComp(Pair<RLink> linkPair) {
+        int out = linkPair.right.count.compareTo(linkPair.left.count);
+        if (out == 0)
+            out = dateComp(new Pair<>(linkPair.left.rev, linkPair.right.rev));
+        return out;
+    }
+
+    private Long[] getTop(Function<Review, Long> which) {
+        MyAVLTree<Long, RLink> linkTree =
+                new MyAVLTree<>((RLink link) ->
+                        (link.id));
+
+        for (Review review : getReviews()) {
+            RLink link = linkTree.search(which.apply(review));
+            if (link == null)
+                linkTree.insert(new RLink(which.apply(review), review, 1));
+            else {
+                if (review.getDateReviewed().compareTo(link.rev.getDateReviewed()) > 0)
+                    link.rev = review;
+                link.count++;
+            }
+        }
+        Object[] unCast = linkTree.inorder();
+        RLink[] arr = new RLink[unCast.length];
+
+        for (int i = 0; i < unCast.length; i++)
+            arr[i] = (RLink) unCast[i];
+
+        linkSorter.sort(arr);
+
+        Long[] top = new Long[20];
+
+        int z = 20;
+        if (arr.length < 20)
+            z = arr.length;
+
+        for (int i = 0; i < z; i++)
+            top[i] = arr[i].id;
+        return top;
+    }
+
+    static class RestaurantRating {
+        private final Long restaurantID;
+        protected int count;
+        protected int totalRating;
+        protected Review latestReview;
+
+
+        public RestaurantRating(Long restaurantID) {
+            this.restaurantID = restaurantID;
+            this.count = 0;
+            this.totalRating = 0;
+        }
+
+        public void addReview(Review review) {
+            this.count++;
+            this.totalRating += review.getRating();
+            if (this.latestReview == null)
+                latestReview = review;
+            else if (latestReview.getDateReviewed().before(review.getDateReviewed()))
+                latestReview = review;
+        }
     }
 
     public Long[] getTopRatedRestaurants() {
-        // TODO
-        return new Long[20];
+        MyAVLTree<Long, RestaurantRating> rrTree = new MyAVLTree<>((RestaurantRating RR) -> (RR.restaurantID));
+
+        for (Review review: getReviews()) {
+            RestaurantRating RR = rrTree.search(review.getRestaurantID());
+            if (RR == null) {
+                RR = new RestaurantRating(review.getRestaurantID());
+                rrTree.insert(RR);
+            }
+            RR.addReview(review);
+        }
+
+        Object[] unCast = rrTree.inorder();
+        RestaurantRating[] arr = new RestaurantRating[unCast.length];
+
+        for (int i = 0; i < unCast.length; i++)
+            arr[i] = (RestaurantRating) unCast[i];
+
+        rrSorter.sort(arr);
+
+        Long[] top = new Long[20];
+
+        for (int i=0; i<20;i++)
+            top[i] = arr[i].restaurantID;
+        return top;
+
+    }
+
+    static class KeywordCounter {
+        private String keyword;
+        protected int count;
+        public KeywordCounter(String keyword) {
+            this.keyword = keyword;
+            this.count = 0;
+        }
+
+        public String getKeyword() {
+            return keyword;
+        }
     }
 
     public String[] getTopKeywordsForRestaurant(Long id) {
-        // TODO
-        return new String[5];
+        Review[] all = getReviewsByRestaurantID(id);
+        if (all.length == 0)
+            return new String[5];
+        MyAVLTree<String, KeywordCounter> keywordAVL = new MyAVLTree<>(KeywordCounter::getKeyword);
+
+        for (Review review: all) {
+            String[] words = review.getReview().split(" ");
+            for (String word: words) {
+                if (!keywordChecker.enhancedCheck(word))
+                    continue;
+                KeywordCounter KC = keywordAVL.search(word);
+                if (KC == null) {
+                    KC = new KeywordCounter(word);
+                    keywordAVL.insert(KC);
+                }
+                KC.count++;
+            }
+        }
+
+        Object[] unCast = keywordAVL.inorder();
+        KeywordCounter[] arr = new KeywordCounter[unCast.length];
+
+        for (int i=0;i<unCast.length;i++)
+            arr[i] =  (KeywordCounter) unCast[i];
+
+        kwSorter.sort(arr);
+
+        String[] top = new String[5];
+
+        for (int i =0;i<5;i++)
+            top[i] = arr[i].keyword;
+
+        return top;
+
     }
 
     public Review[] getReviewsContaining(String searchTerm) {
-        // TODO
-        // String searchTermConverted = stringFormatter.convertAccents(searchTerm);
-        // String searchTermConvertedFaster = stringFormatter.convertAccentsFaster(searchTerm);
-        return new Review[0];
+
+        if (searchTerm == null || searchTerm.equals("")) {
+            return new Review[0];
+        }
+        String searchTermProcessed = StringFormatter.
+                convertAccentsFaster(searchTerm).
+                toLowerCase().
+                replaceAll("[ ]{2,}", " "); // this replaces all 2 or more whitespaces with 1.
+        Review[] arr1 = getReviewsByDate();
+        MyArrayList<Review> list = new MyArrayList<>();
+
+        for (Review review : arr1) {
+            if (review.getReview().contains(searchTermProcessed))
+                list.add(review);
+        }
+
+        return intoReviewArray(list.getArray());
     }
 }

@@ -28,7 +28,7 @@ public class FavouriteStore implements IFavouriteStore {
     private final MyAVLTree<Long, MyArrayList<Favourite>> youngerAVL;
     private final DataChecker dataChecker;
     private final Sorter<Favourite> sorter;
-    private final Sorter<Link> linkSorter;
+    private final Sorter<FLink> linkSorter;
 
     public static void main(String[] args) {
         FavouriteStore favouriteStore = new FavouriteStore();
@@ -391,37 +391,33 @@ public class FavouriteStore implements IFavouriteStore {
         return ids;
     }
 
-    private Integer topComp(Pair<Link> linkPair) {
+    private Integer topComp(Pair<FLink> linkPair) {
         int out = linkPair.right.count.compareTo(linkPair.left.count);
         if (out == 0)
-            out = linkPair.left.fave.getDateFavourited().compareTo(
-                    linkPair.right.fave.getDateFavourited()
-            );
-        if (out == 0)
-            out = linkPair.left.id.compareTo(linkPair.right.id);
+            out = dateComp(new Pair<>(linkPair.left.fave, linkPair.right.fave));
         return out;
     }
 
     private Long[] getTop(Function<Favourite, Long> which) {
-            MyAVLTree<Long, Link> linkTree =
-                    new MyAVLTree<>((Link link) ->
-                            (link.id));
+            MyAVLTree<Long, FLink> linkTree =
+                    new MyAVLTree<>((FLink FLink) ->
+                            (FLink.id));
 
             for (Favourite f : getFavourites()) {
-                Link link = linkTree.search(which.apply(f));
-                if (link == null)
-                    linkTree.insert(new Link(which.apply(f), f, 1));
+                FLink FLink = linkTree.search(which.apply(f));
+                if (FLink == null)
+                    linkTree.insert(new FLink(which.apply(f), f, 1));
                 else {
-                    if (f.getDateFavourited().compareTo(link.fave.getDateFavourited()) > 0)
-                        link.fave = f;
-                    link.count++;
+                    if (f.getDateFavourited().compareTo(FLink.fave.getDateFavourited()) > 0)
+                        FLink.fave = f;
+                    FLink.count++;
                 }
             }
             Object[] unCast = linkTree.inorder();
-            Link[] arr = new Link[unCast.length];
+            FLink[] arr = new FLink[unCast.length];
 
             for (int i = 0; i < unCast.length; i++)
-                arr[i] = (Link) unCast[i];
+                arr[i] = (FLink) unCast[i];
 
             linkSorter.sort(arr);
 
