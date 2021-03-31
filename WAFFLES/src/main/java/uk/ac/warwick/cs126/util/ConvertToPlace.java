@@ -11,7 +11,6 @@ import org.apache.commons.io.IOUtils;
 import uk.ac.warwick.cs126.structures.LLElement;
 import uk.ac.warwick.cs126.structures.MyAVLTree;
 import uk.ac.warwick.cs126.structures.MyLinkedList;
-import uk.ac.warwick.cs126.structures.Pair;
 
 public class ConvertToPlace implements IConvertToPlace {
     private final MyAVLTree<Float, MyLinkedList<Place>> places;
