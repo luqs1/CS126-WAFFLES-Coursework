@@ -1,14 +1,12 @@
 package uk.ac.warwick.cs126.stores;
 
 import uk.ac.warwick.cs126.interfaces.IReviewStore;
-import uk.ac.warwick.cs126.models.Restaurant;
 import uk.ac.warwick.cs126.models.Review;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.function.Function;
 
 import org.apache.commons.io.IOUtils;
@@ -150,22 +148,25 @@ public class ReviewStore implements IReviewStore {
         return true;
     }
 
-    private boolean add(Review review) {
+    private void add(Review review) {
         if (review == null)
-            return false;
-        return reviewAVL.insert(review) & addArrayAVL(review, customersRevAVL);
+            return;
+        reviewAVL.insert(review);
+        addArrayAVL(review, customersRevAVL);
     }
 
-    private boolean remove(Review review){
+    private void remove(Review review){
         if (review == null)
-            return false;
-        return reviewAVL.remove(review) & removeArrayAVL(review, customersRevAVL);
+            return;
+        reviewAVL.remove(review);
+        removeArrayAVL(review, customersRevAVL);
     }
 
-    private boolean bAdd(Review review) {
+    private void bAdd(Review review) {
         if (review == null)
-            return false;
-        return blacklisted.insert(review) & addArrayAVL(review,bCustomersRevAVL);
+            return;
+        blacklisted.insert(review);
+        addArrayAVL(review, bCustomersRevAVL);
     }
 
     private boolean bRemove(Review review) {
@@ -175,7 +176,7 @@ public class ReviewStore implements IReviewStore {
     }
 
     public boolean addReview(Review review) {
-        // TODO
+        // Weird stalling, so I commented out the add logic.
 
         if (!dataChecker.isValid(review) || blacklisted.search(review)) //Invalid
             return false;
@@ -290,13 +291,19 @@ public class ReviewStore implements IReviewStore {
     }
 
     public Review[] getReviewsByCustomerID(Long id) {
-        // TODO
         if (id == null)
             return new Review[0];
-        MyArrayList<Review> list = customersRevAVL.search(id);
-        if (list == null)
-            return new Review[0];
-        return sorter.sort(intoReviewArray(list.getArray()), this::dateComp);
+        MyArrayList<Review> list = new MyArrayList<>();
+        for (Review review : getReviews()) {
+            if (review.getCustomerID().equals(id))
+                list.add(review);
+        }
+
+        Review[] out = intoReviewArray(list.getArray()) ;
+
+        sorter.sort(out, this::dateComp);
+
+        return out;
     }
 
     public Review[] getReviewsByRestaurantID(Long id) {
@@ -339,7 +346,7 @@ public class ReviewStore implements IReviewStore {
         Review[] all = getReviewsByCustomerID(id);
         int[] counts = new int[5];
         for (Review review: all)
-            counts[review.getRating()]++;
+            counts[review.getRating()-1]++;
         return counts;
     }
 
@@ -347,7 +354,7 @@ public class ReviewStore implements IReviewStore {
         Review[] all = getReviewsByRestaurantID(id);
         int[] counts = new int[5];
         for (Review review: all)
-            counts[review.getRating()]++;
+            counts[review.getRating()-1]++;
         return counts;
     }
 
@@ -487,15 +494,17 @@ public class ReviewStore implements IReviewStore {
         Object[] unCast = keywordAVL.inorder();
         KeywordCounter[] arr = new KeywordCounter[unCast.length];
 
-        for (int i=0;i<unCast.length;i++)
-            arr[i] =  (KeywordCounter) unCast[i];
+        for (int i=0;i<unCast.length;i++) {
+            arr[i] = (KeywordCounter) unCast[i];
+        }
 
         kwSorter.sort(arr);
 
         String[] top = new String[5];
 
-        for (int i =0;i<5;i++)
+        for (int i =0;i< unCast.length;i++) {
             top[i] = arr[i].keyword;
+        }
 
         return top;
 

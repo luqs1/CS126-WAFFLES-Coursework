@@ -149,7 +149,7 @@ public class FavouriteStore implements IFavouriteStore {
         return blacklisted.remove(favourite) & removeArrayAVL(favourite, bCustomersAVL);
     }
 
-    public boolean addFavourite(Favourite favourite) { //TODO: This has to be the problem right?
+    public boolean addFavourite(Favourite favourite) {
         if (!dataChecker.isValid(favourite) || blacklisted.search(favourite)) //Invalid
             return false;
 
